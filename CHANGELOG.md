@@ -5,16 +5,25 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.2.0] — 2026-04-14
+
+### Added
+- `detectRequirements(v1Html)` dans `export.js` — analyse statique du HTML généré à l'export
+  - **Erreurs bloquantes** : `process.env` / `import.meta.env`, placeholders de clé API (`YOUR_API_KEY`…)
+  - **Avertissements** : appels backend `/api/`, fonctions d'auth sans service, Firebase/Supabase/MongoDB, `<form>` sans handler `onsubmit`
+  - **Infos** : persistance `localStorage` uniquement, pattern BYOK
+  - Résultats affichés dans la sidebar du dashboard (label + détail explicatif), groupés par niveau, visibles depuis tous les onglets
+
 ## [1.1.0] — 2026-04-14
 
 ### Added
 - `export.js` — générateur d'archive ZIP en fin de pipeline via JSZip (CDN)
-  - `index.html` dashboard : navigation latérale entre tous les livrables (cadrage, personas, user stories, parcours, architecture, wireframes en iframe, audit RGAA), dark theme cohérent avec l'app
-  - Dossier `webapp/` contenant la V1 production, accessible depuis le dashboard via "Ouvrir l'app V1"
+  - `index.html` dashboard : sidebar de navigation entre tous les livrables (cadrage, personas, user stories, parcours, architecture, wireframes en iframe srcdoc, audit RGAA), dark theme cohérent avec l'app
+  - Dossier `webapp/` contenant la V1 production, ouverture via bouton "Ouvrir l'app V1"
   - Téléchargement déclenché via `Blob` + `URL.createObjectURL`
 - Bouton **Télécharger les livrables (.zip)** dans le banner de fin de pipeline (avec état loading)
 - `GithubPagesTuto` — modale tutoriel statique (zéro appel LLM) pour déployer l'**app générée** sur GitHub Pages
-  - 5 étapes : télécharger les livrables → créer un repo → pousser → activer Pages → URL
+  - 5 étapes : télécharger les livrables → créer un repo → pousser `webapp/` → activer Pages → URL
   - Blocs de commandes git copiables en 1 clic (feedback visuel ✓)
 - Bouton **GitHub Pages** (icône + label) dans la top bar, accessible depuis tous les écrans
 

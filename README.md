@@ -71,26 +71,27 @@ Un tutoriel interactif est disponible directement dans l'app via le bouton **Git
 
 ## Export des livrables
 
-En fin de pipeline, le bouton **Télécharger les livrables** génère une archive ZIP contenant :
+En fin de pipeline, le bouton **Télécharger les livrables** génère une archive ZIP :
 
 ```
 ux-pilot-[nom-projet].zip
-└── ux-pilot-livrables/
-    ├── 01-cadrage.html
-    ├── 02-personas.html
-    ├── 03-user-stories.html
-    ├── 04-parcours.html
-    ├── 05-architecture.html
-    ├── 06-wireframes.html
-    ├── 07-audit-rgaa.html
-    ├── 08-v1-production.html
-    └── maquette/
-        ├── index.html   ← wireframe sans styles inline
-        ├── style.css    ← CSS extrait
-        └── script.js   ← JS extrait
+└── ux-pilot-[nom-projet]/
+    ├── index.html   ← dashboard de navigation entre tous les livrables
+    └── webapp/
+        └── index.html   ← V1 production (app générée)
 ```
 
-Chaque fichier HTML est autonome (styles inline, dark theme), prêt à être partagé ou intégré.
+Le `index.html` est un dashboard autonome (dark theme, aucune dépendance externe) avec une sidebar de navigation entre les 7 livrables UX (cadrage, personas, user stories, parcours, architecture, wireframes en iframe, audit RGAA) et un bouton **Ouvrir l'app V1** qui pointe vers `webapp/index.html`.
+
+### Détection des implémentations requises
+
+À la génération du ZIP, `export.js` analyse statiquement la V1 et affiche dans la sidebar du dashboard les points nécessitant une implémentation complémentaire, classés en trois niveaux :
+
+| Niveau | Cas détectés |
+|--------|-------------|
+| 🔴 Erreur | `process.env`, placeholders de clé API |
+| 🟡 Avertissement | Appels backend `/api/`, auth sans service, BDD externe, formulaires sans handler |
+| 🔵 Info | Persistance `localStorage` uniquement, pattern BYOK |
 
 ## Sécurité
 
