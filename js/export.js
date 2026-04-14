@@ -169,6 +169,67 @@ function sectionRgaa(d) {
     </table></div></div>`:''}`;
 }
 
+// ── Détection des implémentations requises dans la V1 ─────────────────────────
+function detectRequirements(v1Html) {
+  if (!v1Html) return [];
+  const h = v1Html;
+  const found = [];
+
+  const checks = [
+    {
+      level: 'error',
+      label: 'Variables d\'environnement',
+      detail: 'process.env / import.meta.env ne fonctionnent pas dans un fichier HTML statique. Remplacez par des valeurs en dur ou une config runtime.',
+      test: h => /process\.env\.|import\.meta\.env/.test(h),
+    },
+    {
+      level: 'error',
+      label: 'Clé API en placeholder',
+      detail: 'Des placeholders (YOUR_API_KEY, VOTRE_CLÉ…) sont présents dans le code. Remplacez-les avant de déployer.',
+      test: h => /YOUR[_-]?API[_-]?KEY|VOTRE[_\-]?CL[ÉE]|INSERT[_-]?(?:API[_-]?)?KEY|<YOUR_|<VOTRE_/i.test(h),
+    },
+    {
+      level: 'warning',
+      label: 'Appels vers un backend',
+      detail: 'L\'app effectue des requêtes fetch/axios vers /api/ ou un endpoint externe qui nécessite un serveur.',
+      test: h => /fetch\s*\(\s*['"`][^'"`]*\/api\//i.test(h) || /axios\s*\.\s*(?:get|post|put|patch|delete)\s*\(\s*['"`][^'"`]*\/api\//i.test(h),
+    },
+    {
+      level: 'warning',
+      label: 'Authentification utilisateur',
+      detail: 'Des fonctions de connexion/inscription sont présentes. Elles nécessitent un service d\'auth (Firebase, Supabase, Auth0…).',
+      test: h => /(?:function|const|let|var)\s+(?:login|logout|signIn|signOut|register|authenticate)\s*[=(]/i.test(h),
+    },
+    {
+      level: 'warning',
+      label: 'Base de données externe',
+      detail: 'L\'app référence Firebase, Supabase, MongoDB ou similaire. La configuration et les credentials de connexion sont requis.',
+      test: h => /firebase\.initializeApp|supabase\.createClient|mongoose\.connect|new\s+MongoClient|DATABASE_URL/i.test(h),
+    },
+    {
+      level: 'warning',
+      label: 'Formulaires sans handler',
+      detail: 'Un ou plusieurs <form> n\'ont pas de handler onsubmit inline — la soumission peut ne rien faire ou recharger la page.',
+      test: h => /<form(?![^>]*onsubmit)[^>]*>/i.test(h) && !/<form[^>]*action\s*=\s*['"]#/i.test(h),
+    },
+    {
+      level: 'info',
+      label: 'Données en localStorage',
+      detail: 'Les données sont stockées côté navigateur uniquement — non partagées entre appareils, effaçables à tout moment.',
+      test: h => /localStorage\.setItem|localStorage\.getItem/.test(h),
+    },
+    {
+      level: 'info',
+      label: 'BYOK — Clé API utilisateur',
+      detail: 'L\'app demande à l\'utilisateur de saisir sa propre clé API. Assurez-vous que les instructions sont explicites dans l\'UI.',
+      test: h => /sessionStorage.*api.?key|prompt\s*\(.*(?:api|clé|key)/i.test(h),
+    },
+  ];
+
+  checks.forEach(c => { if (c.test(h)) found.push(c); });
+  return found;
+}
+
 // ── Dashboard complet (fichier index.html) ────────────────────────────────────
 function generateDashboard(res, projectTitle) {
   const titre = escH(res.cadrage?.titre || projectTitle || 'Projet');
@@ -197,6 +258,26 @@ function generateDashboard(res, projectTitle) {
     </button>`).join('');
 
   const hasV1 = !!res.v1;
+  const reqs  = detectRequirements(res.v1);
+  const reqErrors   = reqs.filter(r => r.level === 'error');
+  const reqWarnings = reqs.filter(r => r.level === 'warning');
+  const reqInfos    = reqs.filter(r => r.level === 'info');
+
+  const reqsHTML = reqs.length ? `
+    <div class="divider"></div>
+    <div class="reqs-header">
+      ${reqErrors.length   ? `<span class="req-count req-error">${reqErrors.length} erreur${reqErrors.length>1?'s':''}</span>` : ''}
+      ${reqWarnings.length ? `<span class="req-count req-warn">${reqWarnings.length} avertissement${reqWarnings.length>1?'s':''}</span>` : ''}
+      ${reqInfos.length    ? `<span class="req-count req-info">${reqInfos.length} info${reqInfos.length>1?'s':''}</span>` : ''}
+    </div>
+    ${reqs.map(r => `
+    <div class="req-item req-item-${r.level}" title="${escH(r.detail)}">
+      <div class="req-dot req-dot-${r.level}"></div>
+      <div>
+        <div class="req-label">${escH(r.label)}</div>
+        <div class="req-detail">${escH(r.detail)}</div>
+      </div>
+    </div>`).join('')}` : '';
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -272,6 +353,21 @@ function generateDashboard(res, projectTitle) {
     .tbl td { padding: 9px 12px; font-size: 12px; color: rgba(255,255,255,.65); border-bottom: 1px solid rgba(255,255,255,.04); }
     .tbl tr.alt td { background: rgba(255,255,255,.015); }
 
+    /* ── Requirements panel ── */
+    .reqs-header { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+    .req-count   { font-size: 10px; font-weight: 500; border-radius: 10px; padding: 2px 8px; }
+    .req-count.req-error { background: rgba(220,88,42,.15); color: #dc582a; }
+    .req-count.req-warn  { background: rgba(245,158,11,.12); color: #f59e0b; }
+    .req-count.req-info  { background: rgba(59,130,246,.12); color: #3b82f6; }
+    .req-item { display: flex; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+    .req-item:last-child { border-bottom: none; }
+    .req-dot { width: 6px; height: 6px; min-width: 6px; border-radius: 50%; margin-top: 5px; }
+    .req-dot-error   { background: #dc582a; }
+    .req-dot-warning { background: #f59e0b; }
+    .req-dot-info    { background: #3b82f6; }
+    .req-label  { font-size: 11px; font-weight: 500; color: rgba(255,255,255,.7); margin-bottom: 2px; }
+    .req-detail { font-size: 10px; font-weight: 300; color: rgba(255,255,255,.35); line-height: 1.5; }
+
     /* ── Footer ── */
     .footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.06); display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,.2); letter-spacing: .05em; }
   </style>
@@ -291,6 +387,8 @@ function generateDashboard(res, projectTitle) {
 
     <div class="divider"></div>
     <nav>${navHTML}</nav>
+
+    ${reqsHTML}
 
     <div style="flex:1"></div>
     <div class="engine">
