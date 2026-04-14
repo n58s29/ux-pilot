@@ -5,6 +5,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.4.0] — 2026-04-14
+
+### Added
+- **Design system optionnel** — bloc collapsible "DESIGN SYSTEM — V1 UNIQUEMENT" dans le Landing
+  - Textarea avec placeholder guidé (couleurs hex, typo, rayons, boutons, grille…)
+  - Badge "actif" visible même quand le bloc est replié
+  - Injecté uniquement dans le prompt V1 (les 7 autres étapes ne le voient pas)
+  - Si absent : fallback design SNCF par défaut (`#00205b` / `#e2001a`)
+  - Réinitialisé à "Nouvelle mission"
+- **Persistance clé API** — `sessionStorage` → `localStorage` : la clé survit aux refreshs, effacée uniquement via "Changer clé API"
+
+---
+
 ## [1.3.0] — 2026-04-14
 
 ### Fixed

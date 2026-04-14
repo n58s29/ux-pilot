@@ -15,7 +15,7 @@ UX Pilot génère l'intégralité d'une phase de découverte UX à partir d'une 
 | 5 | **Architecture de l'information** — sitemap & navigation |
 | 6 | **Wireframes** — maquettes fil de fer HTML basse fidélité |
 | 7 | **Audit RGAA** — conformité accessibilité RGAA 4.1 niveau AA |
-| 8 | **V1 Production** — application HTML/CSS/JS opérationnelle (navigation, boutons, formulaires, données mockées) |
+| 8 | **V1 Production** — application HTML/CSS/JS opérationnelle (navigation, boutons, formulaires, données mockées) — design system optionnel |
 
 ## Stack
 
@@ -92,6 +92,20 @@ Le `index.html` est un dashboard autonome (dark theme, aucune dépendance extern
 | 🔴 Erreur | `process.env`, placeholders de clé API |
 | 🟡 Avertissement | Appels backend `/api/`, auth sans service, BDD externe, formulaires sans handler |
 | 🔵 Info | Persistance `localStorage` uniquement, pattern BYOK |
+
+## Design system
+
+Un champ optionnel **"Design System — V1 uniquement"** est disponible sur l'écran d'accueil, avant le lancement du pipeline. Il permet d'injecter vos tokens de design directement dans le prompt de génération de la V1 :
+
+```
+- Couleur principale : #005EB8 (bleu), secondaire : #00A550 (vert)
+- Typographie : Marianne, titre 32px/700, corps 14px/400
+- Rayon de bordure : 4px, ombres légères
+- Bouton primaire : fond #005EB8, texte blanc, hover #004C99
+- Grille 12 colonnes, gutter 16px
+```
+
+Si le champ est vide, la V1 utilise le design SNCF par défaut (`#00205b` / `#e2001a`). Les 7 autres étapes du pipeline (cadrage, personas, stories…) ne sont pas affectées.
 
 ## Sécurité
 
