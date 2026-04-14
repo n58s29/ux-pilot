@@ -5,6 +5,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.3.0] — 2026-04-14
+
+### Fixed
+- **Wireframe & V1 vides** : `callAPI` en mode `raw` strip désormais les balises markdown (` ```html `) que le modèle ajoutait autour du HTML — l'iframe affiche maintenant le rendu correct
+- **V1 = maquette non fonctionnelle** : prompt système V1 entièrement réécrit avec 10 exigences explicites (navigation SPA, boutons avec handlers JS réels, formulaires avec validation, données mockées, zéro placeholder)
+
+### Changed
+- `max_tokens` V1 : 4 096 → **32 000** — place suffisante pour une application complète et opérationnelle
+- `max_tokens` wireframe : 4 000 → 6 000
+- `max_tokens` relevés sur toutes les étapes JSON : cadrage/personas/architecture 2 000 → 4 000, stories/journey/RGAA 3 000 → 6 000
+- Prompt wireframe : ajout instruction explicite "HTML brut sans markdown"
+
+---
+
 ## [1.2.0] — 2026-04-14
 
 ### Added

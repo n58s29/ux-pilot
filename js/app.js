@@ -462,14 +462,14 @@ function App() {
       try {
         let p;
         switch (s.id) {
-          case "cadrage":      p = PR.cadrage(need);                                r.cadrage      = await callAPI(p.s, p.u, apiKey, false, 2000); break;
-          case "personas":     p = PR.personas(r.cadrage);                          r.personas     = await callAPI(p.s, p.u, apiKey, false, 2000); break;
-          case "stories":      p = PR.stories(r.cadrage, r.personas);               r.stories      = await callAPI(p.s, p.u, apiKey, false, 3000); break;
-          case "journey":      p = PR.journey(r.cadrage, r.personas, r.stories);    r.journey      = await callAPI(p.s, p.u, apiKey, false, 3000); break;
-          case "architecture": p = PR.architecture(r.cadrage, r.stories);           r.architecture = await callAPI(p.s, p.u, apiKey, false, 2000); break;
-          case "wireframes":   p = PR.wireframes(r.cadrage, r.architecture);        r.wireframes   = await callAPI(p.s, p.u, apiKey, true,  4000); break;
-          case "rgaa":         p = PR.rgaa(r.cadrage, r.architecture);              r.rgaa         = await callAPI(p.s, p.u, apiKey, false, 3000); break;
-          case "v1":           p = PR.v1(r.cadrage, r.personas, r.stories, r.architecture, r.rgaa); r.v1 = await callAPI(p.s, p.u, apiKey, true, 4096); break;
+          case "cadrage":      p = PR.cadrage(need);                                r.cadrage      = await callAPI(p.s, p.u, apiKey, false,  4000); break;
+          case "personas":     p = PR.personas(r.cadrage);                          r.personas     = await callAPI(p.s, p.u, apiKey, false,  4000); break;
+          case "stories":      p = PR.stories(r.cadrage, r.personas);               r.stories      = await callAPI(p.s, p.u, apiKey, false,  6000); break;
+          case "journey":      p = PR.journey(r.cadrage, r.personas, r.stories);    r.journey      = await callAPI(p.s, p.u, apiKey, false,  6000); break;
+          case "architecture": p = PR.architecture(r.cadrage, r.stories);           r.architecture = await callAPI(p.s, p.u, apiKey, false,  4000); break;
+          case "wireframes":   p = PR.wireframes(r.cadrage, r.architecture);        r.wireframes   = await callAPI(p.s, p.u, apiKey, true,   6000); break;
+          case "rgaa":         p = PR.rgaa(r.cadrage, r.architecture);              r.rgaa         = await callAPI(p.s, p.u, apiKey, false,  6000); break;
+          case "v1":           p = PR.v1(r.cadrage, r.personas, r.stories, r.architecture, r.rgaa); r.v1 = await callAPI(p.s, p.u, apiKey, true, 32000); break;
         }
         setTimes(prev => ({ ...prev, [s.id]: ((Date.now() - st) / 1000).toFixed(1) }));
         setRes({ ...r });

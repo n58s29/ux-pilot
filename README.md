@@ -15,12 +15,12 @@ UX Pilot génère l'intégralité d'une phase de découverte UX à partir d'une 
 | 5 | **Architecture de l'information** — sitemap & navigation |
 | 6 | **Wireframes** — maquettes fil de fer HTML basse fidélité |
 | 7 | **Audit RGAA** — conformité accessibilité RGAA 4.1 niveau AA |
-| 8 | **V1 Production** — prototype HTML/CSS/JS fonctionnel |
+| 8 | **V1 Production** — application HTML/CSS/JS opérationnelle (navigation, boutons, formulaires, données mockées) |
 
 ## Stack
 
 - **React 18** (UMD CDN) + **Babel Standalone** — pas de build step
-- **Claude Sonnet 4** via l'API Anthropic (BYOK — clé côté navigateur)
+- **Claude Sonnet 4** via l'API Anthropic (BYOK — clé côté navigateur) — jusqu'à 32 000 tokens pour la V1
 - **JSZip** (CDN) — génération de l'archive ZIP des livrables
 - HTML / CSS / JS vanilla, aucune dépendance npm
 
