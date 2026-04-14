@@ -71,7 +71,7 @@ const PR = {
     u: `Brief:\n${JSON.stringify(b)}\nArchi:\n${JSON.stringify(a)}\n\nAudit RGAA.`,
   }),
 
-  v1: (b, p, st, a, r) => ({
+  v1: (b, p, st, a, r, ds) => ({
     s: `Tu es un développeur frontend senior. Génère une application web V1 COMPLÈTE et OPÉRATIONNELLE en un seul fichier HTML autonome.
 
 EXIGENCES OBLIGATOIRES — chaque point doit être respecté:
@@ -80,12 +80,12 @@ EXIGENCES OBLIGATOIRES — chaque point doit être respecté:
 3. FORMULAIRES: validation HTML5 + JS inline (required, pattern, messages d'erreur visibles)
 4. DONNÉES MOCKÉES: listes, tableaux, cartes avec des vraies données fictives cohérentes avec le projet (10-20 entrées minimum)
 5. ÉTAT INTERACTIF: favoris, sélection, pagination ou filtres selon les user stories
-6. DESIGN: fond blanc #ffffff, couleur principale #00205b (marine SNCF), accents #e2001a, typographie system-ui, ombres et transitions CSS
+6. DESIGN: ${ds ? "respecter scrupuleusement le design system fourni ci-dessous" : "fond blanc #ffffff, couleur principale #00205b (marine SNCF), accents #e2001a, typographie system-ui, ombres et transitions CSS"}
 7. RESPONSIVE: fonctionne sur mobile (375px) et desktop (1280px+), grilles CSS Grid/Flexbox
 8. ACCESSIBILITÉ: aria-label sur boutons icon, contraste AA, focus visible, alt sur images
 9. ZÉRO placeholder: aucun texte "Lorem ipsum", "À implémenter", "TODO", "Coming soon", lien "#" sans action
 10. AUTONOME: tout en un seul fichier, aucune dépendance externe CDN
-
+${ds ? `\nDESIGN SYSTEM À RESPECTER OBLIGATOIREMENT:\n${ds}` : ""}
 IMPORTANT: réponds UNIQUEMENT avec le code HTML brut, sans aucun markdown, sans backticks, sans commentaire avant ou après le code.`,
     u: `Brief:\n${JSON.stringify(b)}\nPersona principal:\n${JSON.stringify(p?.personas?.[0])}\nUser Stories Must+Should:\n${JSON.stringify(st?.stories?.filter(s => ["Must","Should"].includes(s.priorite)))}\nArchitecture (pages à implémenter):\n${JSON.stringify(a)}\nPoints RGAA à corriger:\n${JSON.stringify(r?.axes_amelioration)}\n\nGénère l'application V1 complète et opérationnelle maintenant.`,
   }),

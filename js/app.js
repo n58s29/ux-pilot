@@ -240,7 +240,8 @@ function Sidebar({ step, res, running, onStepClick, onResetKey }) {
 }
 
 // ── Landing page ──────────────────────────────────────────────────────────────
-function Landing({ need, setNeed, onRun, running }) {
+function Landing({ need, setNeed, designSystem, setDesignSystem, onRun, running }) {
+  const [dsOpen, setDsOpen] = useState(false);
   return (
     <div style={{ maxWidth:740, margin:"0 auto", padding:"56px 32px" }}>
       <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(0,211,168,0.1)", border:"1px solid rgba(0,211,168,0.2)", borderRadius:20, padding:"5px 14px", fontSize:11, fontWeight:500, color:"#00d3a8", marginBottom:24 }}>
@@ -275,6 +276,37 @@ function Landing({ need, setNeed, onRun, running }) {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Design system */}
+        <div style={{ marginBottom:22 }}>
+          <button
+            onClick={() => setDsOpen(o => !o)}
+            style={{ display:"flex", alignItems:"center", gap:8, background:"none", border:"none", padding:0, cursor:"pointer", fontFamily:"inherit" }}
+          >
+            <div style={{ ...R.eyebrow, color: dsOpen || designSystem ? "#8374d1" : "rgba(255,255,255,0.35)" }}>
+              DESIGN SYSTEM — V1 UNIQUEMENT
+            </div>
+            <span style={{ fontSize:10, color: dsOpen || designSystem ? "#8374d1" : "rgba(255,255,255,0.25)", transition:"transform 0.2s", display:"inline-block", transform: dsOpen ? "rotate(180deg)" : "none" }}>▾</span>
+            {designSystem && !dsOpen && (
+              <span style={{ fontSize:10, background:"rgba(131,116,209,0.15)", border:"1px solid rgba(131,116,209,0.3)", borderRadius:10, padding:"1px 8px", color:"#8374d1" }}>actif</span>
+            )}
+          </button>
+
+          {dsOpen && (
+            <div style={{ marginTop:10 }}>
+              <textarea
+                value={designSystem}
+                onChange={e => setDesignSystem(e.target.value)}
+                placeholder={`Décrivez votre design system : couleurs, typographie, espacements, composants…\n\nEx :\n- Couleur principale : #005EB8 (bleu), secondaire : #00A550 (vert)\n- Typographie : Marianne (titre 32px/700, corps 14px/400)\n- Rayon de bordure : 4px, ombres légères\n- Bouton primaire : fond #005EB8, texte blanc, hover #004C99\n- Grille 12 colonnes, gutter 16px`}
+                rows={7}
+                style={{ width:"100%", background:"rgba(131,116,209,0.05)", border:"1px solid rgba(131,116,209,0.2)", borderRadius:12, padding:"14px 16px", color:"#fff", fontSize:13, fontWeight:300, fontFamily:"inherit", resize:"vertical", lineHeight:1.7, boxSizing:"border-box" }}
+              />
+              <div style={{ marginTop:6, fontSize:11, color:"rgba(255,255,255,0.25)", fontWeight:300 }}>
+                Optionnel — si absent, la V1 utilisera le design SNCF par défaut (#00205b / #e2001a)
+              </div>
+            </div>
+          )}
         </div>
 
         <button
@@ -422,9 +454,10 @@ function Pipeline({ step, res, running, times, totalTime, msg, err, onReset }) {
 
 // ── Root App ──────────────────────────────────────────────────────────────────
 function App() {
-  const [apiKey,    setApiKey]    = useState(getKey());
-  const [need,      setNeed]      = useState("");
-  const [step,      setStep]      = useState(-1);
+  const [apiKey,       setApiKey]       = useState(getKey());
+  const [need,         setNeed]         = useState("");
+  const [designSystem, setDesignSystem] = useState("");
+  const [step,         setStep]         = useState(-1);
   const [running,   setRunning]   = useState(false);
   const [res,       setRes]       = useState({});
   const [err,       setErr]       = useState(null);
@@ -469,7 +502,7 @@ function App() {
           case "architecture": p = PR.architecture(r.cadrage, r.stories);           r.architecture = await callAPI(p.s, p.u, apiKey, false,  4000); break;
           case "wireframes":   p = PR.wireframes(r.cadrage, r.architecture);        r.wireframes   = await callAPI(p.s, p.u, apiKey, true,   6000); break;
           case "rgaa":         p = PR.rgaa(r.cadrage, r.architecture);              r.rgaa         = await callAPI(p.s, p.u, apiKey, false,  6000); break;
-          case "v1":           p = PR.v1(r.cadrage, r.personas, r.stories, r.architecture, r.rgaa); r.v1 = await callAPI(p.s, p.u, apiKey, true, 32000); break;
+          case "v1":           p = PR.v1(r.cadrage, r.personas, r.stories, r.architecture, r.rgaa, designSystem.trim() || null); r.v1 = await callAPI(p.s, p.u, apiKey, true, 32000); break;
         }
         setTimes(prev => ({ ...prev, [s.id]: ((Date.now() - st) / 1000).toFixed(1) }));
         setRes({ ...r });
@@ -483,7 +516,7 @@ function App() {
     setRunning(false);
   }, [need, apiKey]);
 
-  const reset = () => { setStep(-1); setRes({}); setTimes({}); setNeed(""); setTotalTime(null); setErr(null); };
+  const reset = () => { setStep(-1); setRes({}); setTimes({}); setNeed(""); setDesignSystem(""); setTotalTime(null); setErr(null); };
 
   if (!apiKey) return <ApiKeyModal onSave={k => { localStorage.setItem("ux_pilot_key", k); setApiKey(k); }} />;
 
@@ -525,7 +558,7 @@ function App() {
         {/* Main content */}
         {inPipeline
           ? <Pipeline step={step} res={res} running={running} times={times} totalTime={totalTime} msg={msg} err={err} onReset={reset} />
-          : <div style={{ flex:1, overflowY:"auto", overflowX:"hidden" }}><Landing need={need} setNeed={setNeed} onRun={run} running={running} /></div>
+          : <div style={{ flex:1, overflowY:"auto", overflowX:"hidden" }}><Landing need={need} setNeed={setNeed} designSystem={designSystem} setDesignSystem={setDesignSystem} onRun={run} running={running} /></div>
         }
       </div>
     </div>
