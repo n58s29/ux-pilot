@@ -5,6 +5,22 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.1.0] — 2026-04-14
+
+### Added
+- `export.js` — générateur d'archive ZIP en fin de pipeline via JSZip (CDN)
+  - 8 pages HTML standalone stylées (dark theme, cohérent avec l'app) : cadrage, personas, user stories, parcours, architecture, wireframes, audit RGAA, V1 production
+  - Dossier `maquette/` avec séparation HTML / CSS / JS du wireframe basse fidélité
+  - Téléchargement déclenché via `Blob` + `URL.createObjectURL`
+- Bouton **Télécharger les livrables (.zip)** dans le banner de fin de pipeline (avec état loading)
+- `GithubPagesTuto` — modale tutoriel statique (zéro appel LLM) pour déployer sur GitHub Pages
+  - 4 étapes numérotées spécifiques au repo `ux-pilot`
+  - Blocs de commandes git copiables en 1 clic (feedback visuel ✓)
+  - Note technique sur la compatibilité statique et rappel sécurité clé API
+- Bouton **GitHub Pages** (icône + label) dans la top bar, accessible depuis tous les écrans
+
+---
+
 ## [1.0.0] — 2026-04-14
 
 ### Added

@@ -21,6 +21,7 @@ UX Pilot génère l'intégralité d'une phase de découverte UX à partir d'une 
 
 - **React 18** (UMD CDN) + **Babel Standalone** — pas de build step
 - **Claude Sonnet 4** via l'API Anthropic (BYOK — clé côté navigateur)
+- **JSZip** (CDN) — génération de l'archive ZIP des livrables
 - HTML / CSS / JS vanilla, aucune dépendance npm
 
 ## Structure
@@ -34,6 +35,7 @@ ux-pilot/
     ├── config.js     # Constantes : STEPS, EXAMPLES, FEATURES, tokens de style
     ├── api.js        # callAPI() + constructeurs de prompts (PR)
     ├── views.js      # Composants de rendu par étape
+    ├── export.js     # Générateur d'archive ZIP (templates HTML + maquette séparée)
     └── app.js        # App, Sidebar, Landing, Pipeline + ReactDOM.createRoot
 ```
 
@@ -50,6 +52,45 @@ python -m http.server 8080
 ```
 
 Au premier lancement, l'application demande une **clé API Anthropic** (`sk-ant-…`). Elle est stockée en `sessionStorage` et effacée à la fermeture de l'onglet.
+
+## Déploiement GitHub Pages
+
+UX Pilot est 100% statique — aucun serveur requis. Déploiement en 3 étapes :
+
+```bash
+git init && git add . && git commit -m "feat: initial release"
+git branch -M main
+git remote add origin https://github.com/TON-USERNAME/ux-pilot.git
+git push -u origin main
+```
+
+Puis dans le repository : **Settings → Pages → Deploy from branch → main / (root) → Save**.
+
+L'app est accessible sur `https://TON-USERNAME.github.io/ux-pilot` après ~1 minute.  
+Un tutoriel interactif est disponible directement dans l'app via le bouton **GitHub Pages** dans la barre du haut.
+
+## Export des livrables
+
+En fin de pipeline, le bouton **Télécharger les livrables** génère une archive ZIP contenant :
+
+```
+ux-pilot-[nom-projet].zip
+└── ux-pilot-livrables/
+    ├── 01-cadrage.html
+    ├── 02-personas.html
+    ├── 03-user-stories.html
+    ├── 04-parcours.html
+    ├── 05-architecture.html
+    ├── 06-wireframes.html
+    ├── 07-audit-rgaa.html
+    ├── 08-v1-production.html
+    └── maquette/
+        ├── index.html   ← wireframe sans styles inline
+        ├── style.css    ← CSS extrait
+        └── script.js   ← JS extrait
+```
+
+Chaque fichier HTML est autonome (styles inline, dark theme), prêt à être partagé ou intégré.
 
 ## Sécurité
 

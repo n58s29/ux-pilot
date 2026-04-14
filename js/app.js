@@ -13,6 +13,134 @@ const STEP_MSGS = {
   v1:           ["Génération application...",  "Intégration composants...",   "Recommandations RGAA..."],
 };
 
+// ── GitHub Pages tutorial modal ───────────────────────────────────────────────
+function GithubPagesTuto({ onClose }) {
+  const [copied, setCopied] = useState(null);
+
+  const copy = (id, text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(id);
+      setTimeout(() => setCopied(null), 2000);
+    });
+  };
+
+  const S = {
+    overlay:  { position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", backdropFilter:"blur(6px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000, padding:24 },
+    modal:    { background:"#0e1426", border:"1px solid rgba(255,255,255,0.08)", borderRadius:20, padding:"36px 40px", maxWidth:640, width:"100%", maxHeight:"88vh", overflowY:"auto", position:"relative" },
+    step:     { display:"flex", gap:16, marginBottom:28 },
+    num:      { width:28, height:28, minWidth:28, borderRadius:8, background:"rgba(0,211,168,0.12)", border:"1px solid rgba(0,211,168,0.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:600, color:"#00d3a8", marginTop:2 },
+    h3:       { fontSize:14, fontWeight:500, marginBottom:6, color:"#fff" },
+    p:        { fontSize:13, fontWeight:300, color:"rgba(255,255,255,0.55)", lineHeight:1.7 },
+    code:     { position:"relative", background:"rgba(0,0,0,0.45)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:10, padding:"14px 48px 14px 18px", fontFamily:"'SF Mono','Fira Code',monospace", fontSize:12, color:"rgba(255,255,255,0.8)", lineHeight:1.7, marginTop:10, whiteSpace:"pre", overflowX:"auto", display:"block" },
+    copy:     { position:"absolute", top:10, right:10, background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:6, padding:"3px 9px", fontSize:10, color:"rgba(255,255,255,0.5)", cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s" },
+    note:     { background:"rgba(0,211,168,0.06)", border:"1px solid rgba(0,211,168,0.15)", borderRadius:12, padding:"14px 18px", marginTop:8 },
+    warn:     { background:"rgba(245,158,11,0.06)", border:"1px solid rgba(245,158,11,0.15)", borderRadius:12, padding:"14px 18px", marginTop:16 },
+  };
+
+  const CMD1 = `git init
+git add .
+git commit -m "feat: initial release — UX Pilot"
+git branch -M main
+git remote add origin https://github.com/TON-USERNAME/ux-pilot.git
+git push -u origin main`;
+
+  const CMD2 = `# Si le repo existe déjà sur GitHub (fork ou clone) :
+git add .
+git commit -m "update"
+git push`;
+
+  return (
+    <div style={S.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
+      <div style={S.modal}>
+        {/* Header */}
+        <button onClick={onClose} style={{ position:"absolute", top:20, right:20, background:"none", border:"none", color:"rgba(255,255,255,0.3)", fontSize:20, cursor:"pointer", lineHeight:1 }}>×</button>
+        <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(0,211,168,0.1)", border:"1px solid rgba(0,211,168,0.2)", borderRadius:20, padding:"5px 14px", fontSize:11, fontWeight:500, color:"#00d3a8", marginBottom:16 }}>
+          🐙 DÉPLOIEMENT GITHUB PAGES
+        </div>
+        <h2 style={{ fontSize:22, fontWeight:500, letterSpacing:"-0.02em", marginBottom:6 }}>Mettre UX Pilot en ligne</h2>
+        <p style={{ fontSize:13, fontWeight:300, color:"rgba(255,255,255,0.4)", marginBottom:30, lineHeight:1.6 }}>
+          UX Pilot est un site statique HTML/CSS/JS pur — GitHub Pages l'héberge gratuitement en 3 minutes, sans serveur.
+        </p>
+
+        {/* Step 1 */}
+        <div style={S.step}>
+          <div style={S.num}>1</div>
+          <div style={{ flex:1 }}>
+            <h3 style={S.h3}>Créer le repository sur GitHub</h3>
+            <p style={S.p}>
+              Sur <strong style={{ color:"rgba(255,255,255,0.75)" }}>github.com</strong>, clique sur <em>New repository</em>.<br />
+              Nom : <code style={{ fontSize:12, background:"rgba(0,211,168,0.08)", borderRadius:4, padding:"1px 6px", color:"#00d3a8" }}>ux-pilot</code> · Visibilité : <strong style={{ color:"rgba(255,255,255,0.7)" }}>Public</strong> (requis pour Pages gratuit) · Sans README.
+            </p>
+          </div>
+        </div>
+
+        {/* Step 2 */}
+        <div style={S.step}>
+          <div style={S.num}>2</div>
+          <div style={{ flex:1 }}>
+            <h3 style={S.h3}>Pousser les fichiers</h3>
+            <p style={S.p}>Dans le dossier <code style={{ fontSize:12, background:"rgba(255,255,255,0.06)", borderRadius:4, padding:"1px 6px" }}>ux-pilot/</code>, exécute :</p>
+            <div style={{ position:"relative" }}>
+              <code style={S.code}>{CMD1}</code>
+              <button style={{ ...S.copy, ...(copied === "cmd1" ? { color:"#00d3a8", borderColor:"rgba(0,211,168,0.3)" } : {}) }} onClick={() => copy("cmd1", CMD1)}>
+                {copied === "cmd1" ? "✓ copié" : "copier"}
+              </button>
+            </div>
+            <div style={{ position:"relative", marginTop:8 }}>
+              <code style={{ ...S.code, fontSize:11, color:"rgba(255,255,255,0.5)" }}>{CMD2}</code>
+              <button style={{ ...S.copy, ...(copied === "cmd2" ? { color:"#00d3a8", borderColor:"rgba(0,211,168,0.3)" } : {}) }} onClick={() => copy("cmd2", CMD2)}>
+                {copied === "cmd2" ? "✓ copié" : "copier"}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Step 3 */}
+        <div style={S.step}>
+          <div style={S.num}>3</div>
+          <div style={{ flex:1 }}>
+            <h3 style={S.h3}>Activer GitHub Pages</h3>
+            <p style={S.p}>
+              Dans le repository → <strong style={{ color:"rgba(255,255,255,0.7)" }}>Settings</strong> → <strong style={{ color:"rgba(255,255,255,0.7)" }}>Pages</strong><br />
+              Source : <em>Deploy from a branch</em> · Branch : <code style={{ fontSize:12, background:"rgba(255,255,255,0.06)", borderRadius:4, padding:"1px 6px" }}>main</code> · Folder : <code style={{ fontSize:12, background:"rgba(255,255,255,0.06)", borderRadius:4, padding:"1px 6px" }}>/ (root)</code><br />
+              Clique <strong style={{ color:"rgba(255,255,255,0.7)" }}>Save</strong> — déploiement automatique en ~1 min.
+            </p>
+          </div>
+        </div>
+
+        {/* Step 4 */}
+        <div style={{ ...S.step, marginBottom:20 }}>
+          <div style={S.num}>4</div>
+          <div style={{ flex:1 }}>
+            <h3 style={S.h3}>Accéder à l'app</h3>
+            <p style={S.p}>L'URL de ton instance :</p>
+            <div style={{ position:"relative" }}>
+              <code style={{ ...S.code, color:"#00d3a8" }}>{"https://TON-USERNAME.github.io/ux-pilot"}</code>
+              <button style={{ ...S.copy, ...(copied === "url" ? { color:"#00d3a8", borderColor:"rgba(0,211,168,0.3)" } : {}) }} onClick={() => copy("url", "https://TON-USERNAME.github.io/ux-pilot")}>
+                {copied === "url" ? "✓ copié" : "copier"}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Notes */}
+        <div style={S.note}>
+          <div style={{ fontSize:11, fontWeight:500, color:"#00d3a8", marginBottom:6, letterSpacing:"0.06em" }}>POURQUOI ÇA MARCHE SANS CONFIG</div>
+          <p style={{ fontSize:12, fontWeight:300, color:"rgba(255,255,255,0.55)", lineHeight:1.65 }}>
+            UX Pilot est 100% statique — pas de Node.js, pas de serveur, pas de build. GitHub Pages sert directement <code style={{ fontSize:11, background:"rgba(255,255,255,0.06)", borderRadius:3, padding:"1px 5px" }}>index.html</code> avec les scripts CDN. La clé API est stockée en <code style={{ fontSize:11, background:"rgba(255,255,255,0.06)", borderRadius:3, padding:"1px 5px" }}>sessionStorage</code> côté navigateur — elle ne passe jamais par GitHub.
+          </p>
+        </div>
+        <div style={S.warn}>
+          <div style={{ fontSize:11, fontWeight:500, color:"#f59e0b", marginBottom:6, letterSpacing:"0.06em" }}>RAPPEL SÉCURITÉ</div>
+          <p style={{ fontSize:12, fontWeight:300, color:"rgba(255,255,255,0.55)", lineHeight:1.65 }}>
+            Ne jamais commiter une clé API dans les fichiers. Le repo ne contient aucune clé — c'est l'utilisateur final qui saisit la sienne au démarrage.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── API key modal ─────────────────────────────────────────────────────────────
 function ApiKeyModal({ onSave }) {
   const [k, setK] = useState("");
@@ -179,7 +307,8 @@ function renderStep(id, res) {
 
 // ── Pipeline results view ─────────────────────────────────────────────────────
 function Pipeline({ step, res, running, times, totalTime, msg, err, onReset }) {
-  const mainRef = useRef(null);
+  const mainRef  = useRef(null);
+  const [downloading, setDownloading] = useState(false);
 
   // Auto-scroll when new content appears
   useEffect(() => {
@@ -187,6 +316,17 @@ function Pipeline({ step, res, running, times, totalTime, msg, err, onReset }) {
   }, [res, step]);
 
   const allDone = !running && Object.keys(res).length === STEPS.length;
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      await generateArchive(res, res.cadrage?.titre || "projet");
+    } catch(e) {
+      console.error("Erreur génération archive :", e);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <div style={{ flex:1, overflowY:"auto", overflowX:"hidden" }} ref={mainRef}>
@@ -228,12 +368,27 @@ function Pipeline({ step, res, running, times, totalTime, msg, err, onReset }) {
               ✓ MISSION ACCOMPLIE
             </div>
             <h2 style={{ fontSize:26, fontWeight:500, marginBottom:6 }}>Pipeline Terminé avec Succès</h2>
-            <p style={{ fontSize:14, fontWeight:300, color:"rgba(255,255,255,0.5)", marginBottom:20 }}>
+            <p style={{ fontSize:14, fontWeight:300, color:"rgba(255,255,255,0.5)", marginBottom:24 }}>
               La phase de conception V1 est finalisée. 8 livrables générés en {totalTime}s.
             </p>
-            <button onClick={onReset} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:8, padding:"10px 20px", color:"#fff", fontSize:13, fontWeight:400 }}>
-              Nouvelle mission
-            </button>
+            <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
+              <button
+                onClick={handleDownload}
+                disabled={downloading}
+                style={{ display:"flex", alignItems:"center", gap:8, background: downloading ? "rgba(0,211,168,0.1)" : "linear-gradient(135deg,rgba(0,211,168,0.85),rgba(0,132,212,0.85))", border:"none", borderRadius:8, padding:"11px 22px", color:"#fff", fontSize:13, fontWeight:500, fontFamily:"inherit", cursor: downloading ? "default" : "pointer", opacity: downloading ? 0.7 : 1, transition:"all 0.2s", boxShadow: downloading ? "none" : "0 4px 20px rgba(0,211,168,0.2)" }}
+              >
+                {downloading
+                  ? <><div style={{ width:12, height:12, border:"1.5px solid rgba(255,255,255,0.3)", borderTop:"1.5px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }} /> Génération en cours…</>
+                  : <>⬇ Télécharger les livrables (.zip)</>
+                }
+              </button>
+              <button onClick={onReset} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:8, padding:"10px 20px", color:"#fff", fontSize:13, fontWeight:400, fontFamily:"inherit", cursor:"pointer" }}>
+                Nouvelle mission
+              </button>
+              <span style={{ fontSize:11, color:"rgba(255,255,255,0.25)", fontWeight:300 }}>
+                8 fichiers HTML + maquette séparée
+              </span>
+            </div>
           </div>
         )}
 
@@ -259,6 +414,7 @@ function App() {
   const [msg,       setMsg]       = useState("");
   const [times,     setTimes]     = useState({});
   const [totalTime, setTotalTime] = useState(null);
+  const [showTuto,  setShowTuto]  = useState(false);
 
   // Cycle loading messages for the active step
   useEffect(() => {
@@ -318,6 +474,8 @@ function App() {
 
   return (
     <div style={{ display:"flex", height:"100vh", overflow:"hidden", background:"#0a0f1e" }}>
+      {showTuto && <GithubPagesTuto onClose={() => setShowTuto(false)} />}
+
       <Sidebar step={step} res={res} running={running} onStepClick={setStep} onResetKey={() => { sessionStorage.removeItem("ux_pilot_key"); setApiKey(""); }} />
 
       <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
@@ -331,7 +489,17 @@ function App() {
               </div>
             )}
           </div>
-          <div style={{ display:"flex", gap:4 }}>
+          <div style={{ display:"flex", gap:4, alignItems:"center" }}>
+            <button
+              onClick={() => setShowTuto(true)}
+              title="Déployer sur GitHub Pages"
+              style={{ display:"flex", alignItems:"center", gap:6, height:32, padding:"0 12px", borderRadius:8, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.07)", color:"rgba(255,255,255,0.45)", fontSize:11, fontWeight:400, fontFamily:"inherit", cursor:"pointer", transition:"all 0.2s", letterSpacing:"0.01em" }}
+              onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.07)"; e.currentTarget.style.color="rgba(255,255,255,0.75)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.color="rgba(255,255,255,0.45)"; }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub Pages
+            </button>
             <div style={{ width:32, height:32, borderRadius:8, background:"rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, color:"rgba(255,255,255,0.4)" }}>🔔</div>
             <div style={{ width:32, height:32, borderRadius:8, background:"rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, color:"rgba(255,255,255,0.4)" }}>⚙</div>
           </div>
