@@ -25,52 +25,60 @@ function GithubPagesTuto({ onClose }) {
   };
 
   const S = {
-    overlay:  { position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", backdropFilter:"blur(6px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000, padding:24 },
-    modal:    { background:"#0e1426", border:"1px solid rgba(255,255,255,0.08)", borderRadius:20, padding:"36px 40px", maxWidth:640, width:"100%", maxHeight:"88vh", overflowY:"auto", position:"relative" },
-    step:     { display:"flex", gap:16, marginBottom:28 },
-    num:      { width:28, height:28, minWidth:28, borderRadius:8, background:"rgba(0,211,168,0.12)", border:"1px solid rgba(0,211,168,0.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:600, color:"#00d3a8", marginTop:2 },
-    h3:       { fontSize:14, fontWeight:500, marginBottom:6, color:"#fff" },
-    p:        { fontSize:13, fontWeight:300, color:"rgba(255,255,255,0.55)", lineHeight:1.7 },
-    code:     { position:"relative", background:"rgba(0,0,0,0.45)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:10, padding:"14px 48px 14px 18px", fontFamily:"'SF Mono','Fira Code',monospace", fontSize:12, color:"rgba(255,255,255,0.8)", lineHeight:1.7, marginTop:10, whiteSpace:"pre", overflowX:"auto", display:"block" },
-    copy:     { position:"absolute", top:10, right:10, background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:6, padding:"3px 9px", fontSize:10, color:"rgba(255,255,255,0.5)", cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s" },
-    note:     { background:"rgba(0,211,168,0.06)", border:"1px solid rgba(0,211,168,0.15)", borderRadius:12, padding:"14px 18px", marginTop:8 },
-    warn:     { background:"rgba(245,158,11,0.06)", border:"1px solid rgba(245,158,11,0.15)", borderRadius:12, padding:"14px 18px", marginTop:16 },
+    overlay: { position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", backdropFilter:"blur(6px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000, padding:24 },
+    modal:   { background:"#0e1426", border:"1px solid rgba(255,255,255,0.08)", borderRadius:20, padding:"36px 40px", maxWidth:640, width:"100%", maxHeight:"88vh", overflowY:"auto", position:"relative" },
+    step:    { display:"flex", gap:16, marginBottom:28 },
+    num:     { width:28, height:28, minWidth:28, borderRadius:8, background:"rgba(0,211,168,0.12)", border:"1px solid rgba(0,211,168,0.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:600, color:"#00d3a8", marginTop:2 },
+    h3:      { fontSize:14, fontWeight:500, marginBottom:6, color:"#fff" },
+    p:       { fontSize:13, fontWeight:300, color:"rgba(255,255,255,0.55)", lineHeight:1.7 },
+    code:    { position:"relative", background:"rgba(0,0,0,0.45)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:10, padding:"14px 48px 14px 18px", fontFamily:"'SF Mono','Fira Code',monospace", fontSize:12, color:"rgba(255,255,255,0.8)", lineHeight:1.7, marginTop:10, whiteSpace:"pre", overflowX:"auto", display:"block" },
+    copy:    { position:"absolute", top:10, right:10, background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:6, padding:"3px 9px", fontSize:10, color:"rgba(255,255,255,0.5)", cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s" },
+    note:    { background:"rgba(0,211,168,0.06)", border:"1px solid rgba(0,211,168,0.15)", borderRadius:12, padding:"14px 18px", marginTop:4 },
+    tip:     { background:"rgba(59,130,246,0.06)", border:"1px solid rgba(59,130,246,0.15)", borderRadius:12, padding:"14px 18px", marginTop:16 },
   };
 
-  const CMD1 = `git init
+  const CMD = `cd maquette/
+git init
 git add .
-git commit -m "feat: initial release — UX Pilot"
+git commit -m "feat: initial release"
 git branch -M main
-git remote add origin https://github.com/TON-USERNAME/ux-pilot.git
+git remote add origin https://github.com/TON-USERNAME/NOM-DU-PROJET.git
 git push -u origin main`;
-
-  const CMD2 = `# Si le repo existe déjà sur GitHub (fork ou clone) :
-git add .
-git commit -m "update"
-git push`;
 
   return (
     <div style={S.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
       <div style={S.modal}>
-        {/* Header */}
         <button onClick={onClose} style={{ position:"absolute", top:20, right:20, background:"none", border:"none", color:"rgba(255,255,255,0.3)", fontSize:20, cursor:"pointer", lineHeight:1 }}>×</button>
+
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(0,211,168,0.1)", border:"1px solid rgba(0,211,168,0.2)", borderRadius:20, padding:"5px 14px", fontSize:11, fontWeight:500, color:"#00d3a8", marginBottom:16 }}>
           🐙 DÉPLOIEMENT GITHUB PAGES
         </div>
-        <h2 style={{ fontSize:22, fontWeight:500, letterSpacing:"-0.02em", marginBottom:6 }}>Mettre UX Pilot en ligne</h2>
+        <h2 style={{ fontSize:22, fontWeight:500, letterSpacing:"-0.02em", marginBottom:6 }}>Mettre votre app en ligne</h2>
         <p style={{ fontSize:13, fontWeight:300, color:"rgba(255,255,255,0.4)", marginBottom:30, lineHeight:1.6 }}>
-          UX Pilot est un site statique HTML/CSS/JS pur — GitHub Pages l'héberge gratuitement en 3 minutes, sans serveur.
+          L'app générée est du HTML/CSS/JS pur — GitHub Pages l'héberge gratuitement, sans serveur, en 3 minutes.
         </p>
 
         {/* Step 1 */}
         <div style={S.step}>
           <div style={S.num}>1</div>
           <div style={{ flex:1 }}>
-            <h3 style={S.h3}>Créer le repository sur GitHub</h3>
+            <h3 style={S.h3}>Télécharger les livrables</h3>
             <p style={S.p}>
-              Sur <strong style={{ color:"rgba(255,255,255,0.75)" }}>github.com</strong>, clique sur <em>New repository</em>.<br />
-              Nom : <code style={{ fontSize:12, background:"rgba(0,211,168,0.08)", borderRadius:4, padding:"1px 6px", color:"#00d3a8" }}>ux-pilot</code> · Visibilité : <strong style={{ color:"rgba(255,255,255,0.7)" }}>Public</strong> (requis pour Pages gratuit) · Sans README.
+              Cliquez sur <strong style={{ color:"rgba(255,255,255,0.75)" }}>Télécharger les livrables</strong> en bas de page.<br />
+              Extrayez le ZIP — vous obtenez le dossier <code style={{ fontSize:12, background:"rgba(255,255,255,0.06)", borderRadius:4, padding:"1px 6px" }}>maquette/</code> avec trois fichiers séparés :
             </p>
+            <div style={{ marginTop:12, display:"flex", gap:8 }}>
+              {[
+                { f:"index.html", c:"#00d3a8", desc:"structure" },
+                { f:"style.css",  c:"#3b82f6", desc:"styles"    },
+                { f:"script.js",  c:"#f59e0b", desc:"logique"   },
+              ].map(({ f, c, desc }) => (
+                <div key={f} style={{ flex:1, background:`${c}0d`, border:`1px solid ${c}30`, borderRadius:8, padding:"10px 12px", textAlign:"center" }}>
+                  <div style={{ fontSize:11, fontWeight:500, color:c, marginBottom:2 }}>{f}</div>
+                  <div style={{ fontSize:10, color:"rgba(255,255,255,0.35)" }}>{desc}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -78,20 +86,11 @@ git push`;
         <div style={S.step}>
           <div style={S.num}>2</div>
           <div style={{ flex:1 }}>
-            <h3 style={S.h3}>Pousser les fichiers</h3>
-            <p style={S.p}>Dans le dossier <code style={{ fontSize:12, background:"rgba(255,255,255,0.06)", borderRadius:4, padding:"1px 6px" }}>ux-pilot/</code>, exécute :</p>
-            <div style={{ position:"relative" }}>
-              <code style={S.code}>{CMD1}</code>
-              <button style={{ ...S.copy, ...(copied === "cmd1" ? { color:"#00d3a8", borderColor:"rgba(0,211,168,0.3)" } : {}) }} onClick={() => copy("cmd1", CMD1)}>
-                {copied === "cmd1" ? "✓ copié" : "copier"}
-              </button>
-            </div>
-            <div style={{ position:"relative", marginTop:8 }}>
-              <code style={{ ...S.code, fontSize:11, color:"rgba(255,255,255,0.5)" }}>{CMD2}</code>
-              <button style={{ ...S.copy, ...(copied === "cmd2" ? { color:"#00d3a8", borderColor:"rgba(0,211,168,0.3)" } : {}) }} onClick={() => copy("cmd2", CMD2)}>
-                {copied === "cmd2" ? "✓ copié" : "copier"}
-              </button>
-            </div>
+            <h3 style={S.h3}>Créer un repository GitHub</h3>
+            <p style={S.p}>
+              Sur <strong style={{ color:"rgba(255,255,255,0.75)" }}>github.com</strong> → <em>New repository</em><br />
+              Choisissez un nom (ex. <code style={{ fontSize:12, background:"rgba(0,211,168,0.08)", borderRadius:4, padding:"1px 6px", color:"#00d3a8" }}>mon-projet</code>) · Visibilité : <strong style={{ color:"rgba(255,255,255,0.7)" }}>Public</strong> · Sans README.
+            </p>
           </div>
         </div>
 
@@ -99,41 +98,59 @@ git push`;
         <div style={S.step}>
           <div style={S.num}>3</div>
           <div style={{ flex:1 }}>
-            <h3 style={S.h3}>Activer GitHub Pages</h3>
-            <p style={S.p}>
-              Dans le repository → <strong style={{ color:"rgba(255,255,255,0.7)" }}>Settings</strong> → <strong style={{ color:"rgba(255,255,255,0.7)" }}>Pages</strong><br />
-              Source : <em>Deploy from a branch</em> · Branch : <code style={{ fontSize:12, background:"rgba(255,255,255,0.06)", borderRadius:4, padding:"1px 6px" }}>main</code> · Folder : <code style={{ fontSize:12, background:"rgba(255,255,255,0.06)", borderRadius:4, padding:"1px 6px" }}>/ (root)</code><br />
-              Clique <strong style={{ color:"rgba(255,255,255,0.7)" }}>Save</strong> — déploiement automatique en ~1 min.
-            </p>
+            <h3 style={S.h3}>Pousser le dossier maquette/</h3>
+            <div style={{ position:"relative" }}>
+              <code style={S.code}>{CMD}</code>
+              <button
+                style={{ ...S.copy, ...(copied === "cmd" ? { color:"#00d3a8", borderColor:"rgba(0,211,168,0.3)" } : {}) }}
+                onClick={() => copy("cmd", CMD)}
+              >
+                {copied === "cmd" ? "✓ copié" : "copier"}
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Step 4 */}
-        <div style={{ ...S.step, marginBottom:20 }}>
+        <div style={S.step}>
           <div style={S.num}>4</div>
           <div style={{ flex:1 }}>
-            <h3 style={S.h3}>Accéder à l'app</h3>
-            <p style={S.p}>L'URL de ton instance :</p>
+            <h3 style={S.h3}>Activer GitHub Pages</h3>
+            <p style={S.p}>
+              Dans le repository → <strong style={{ color:"rgba(255,255,255,0.7)" }}>Settings → Pages</strong><br />
+              Source : <em>Deploy from a branch</em> · Branch : <code style={{ fontSize:12, background:"rgba(255,255,255,0.06)", borderRadius:4, padding:"1px 6px" }}>main</code> · <code style={{ fontSize:12, background:"rgba(255,255,255,0.06)", borderRadius:4, padding:"1px 6px" }}>/ (root)</code> → <strong style={{ color:"rgba(255,255,255,0.7)" }}>Save</strong>
+            </p>
+          </div>
+        </div>
+
+        {/* Step 5 */}
+        <div style={{ ...S.step, marginBottom:20 }}>
+          <div style={S.num}>5</div>
+          <div style={{ flex:1 }}>
+            <h3 style={S.h3}>Votre app est en ligne</h3>
+            <p style={S.p}>Disponible après ~1 minute à l'adresse :</p>
             <div style={{ position:"relative" }}>
-              <code style={{ ...S.code, color:"#00d3a8" }}>{"https://TON-USERNAME.github.io/ux-pilot"}</code>
-              <button style={{ ...S.copy, ...(copied === "url" ? { color:"#00d3a8", borderColor:"rgba(0,211,168,0.3)" } : {}) }} onClick={() => copy("url", "https://TON-USERNAME.github.io/ux-pilot")}>
+              <code style={{ ...S.code, color:"#00d3a8" }}>{"https://TON-USERNAME.github.io/NOM-DU-PROJET"}</code>
+              <button
+                style={{ ...S.copy, ...(copied === "url" ? { color:"#00d3a8", borderColor:"rgba(0,211,168,0.3)" } : {}) }}
+                onClick={() => copy("url", "https://TON-USERNAME.github.io/NOM-DU-PROJET")}
+              >
                 {copied === "url" ? "✓ copié" : "copier"}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Notes */}
         <div style={S.note}>
-          <div style={{ fontSize:11, fontWeight:500, color:"#00d3a8", marginBottom:6, letterSpacing:"0.06em" }}>POURQUOI ÇA MARCHE SANS CONFIG</div>
+          <div style={{ fontSize:11, fontWeight:500, color:"#00d3a8", marginBottom:5, letterSpacing:"0.06em" }}>ASTUCE — V1 COMPLÈTE</div>
           <p style={{ fontSize:12, fontWeight:300, color:"rgba(255,255,255,0.55)", lineHeight:1.65 }}>
-            UX Pilot est 100% statique — pas de Node.js, pas de serveur, pas de build. GitHub Pages sert directement <code style={{ fontSize:11, background:"rgba(255,255,255,0.06)", borderRadius:3, padding:"1px 5px" }}>index.html</code> avec les scripts CDN. La clé API est stockée en <code style={{ fontSize:11, background:"rgba(255,255,255,0.06)", borderRadius:3, padding:"1px 5px" }}>sessionStorage</code> côté navigateur — elle ne passe jamais par GitHub.
+            Vous pouvez aussi déployer <code style={{ fontSize:11, background:"rgba(255,255,255,0.06)", borderRadius:3, padding:"1px 5px" }}>08-v1-production.html</code> seul : renommez-le en <code style={{ fontSize:11, background:"rgba(255,255,255,0.06)", borderRadius:3, padding:"1px 5px" }}>index.html</code> et poussez-le à la racine du repo. Tout est auto-contenu dans ce fichier.
           </p>
         </div>
-        <div style={S.warn}>
-          <div style={{ fontSize:11, fontWeight:500, color:"#f59e0b", marginBottom:6, letterSpacing:"0.06em" }}>RAPPEL SÉCURITÉ</div>
+        <div style={S.tip}>
+          <div style={{ fontSize:11, fontWeight:500, color:"#3b82f6", marginBottom:5, letterSpacing:"0.06em" }}>MISES À JOUR</div>
           <p style={{ fontSize:12, fontWeight:300, color:"rgba(255,255,255,0.55)", lineHeight:1.65 }}>
-            Ne jamais commiter une clé API dans les fichiers. Le repo ne contient aucune clé — c'est l'utilisateur final qui saisit la sienne au démarrage.
+            Pour mettre à jour l'app après une nouvelle génération, remplacez les fichiers et faites <code style={{ fontSize:11, background:"rgba(255,255,255,0.06)", borderRadius:3, padding:"1px 5px" }}>git add . && git commit -m "update" && git push</code> — GitHub Pages se redéploie automatiquement.
           </p>
         </div>
       </div>

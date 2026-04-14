@@ -13,10 +13,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Dossier `maquette/` avec séparation HTML / CSS / JS du wireframe basse fidélité
   - Téléchargement déclenché via `Blob` + `URL.createObjectURL`
 - Bouton **Télécharger les livrables (.zip)** dans le banner de fin de pipeline (avec état loading)
-- `GithubPagesTuto` — modale tutoriel statique (zéro appel LLM) pour déployer sur GitHub Pages
-  - 4 étapes numérotées spécifiques au repo `ux-pilot`
+- `GithubPagesTuto` — modale tutoriel statique (zéro appel LLM) pour déployer l'**app générée** sur GitHub Pages
+  - 5 étapes : télécharger les livrables → créer un repo → pousser `maquette/` → activer Pages → URL
   - Blocs de commandes git copiables en 1 clic (feedback visuel ✓)
-  - Note technique sur la compatibilité statique et rappel sécurité clé API
+  - Astuce : déploiement alternatif via `08-v1-production.html` renommé en `index.html`
+  - Astuce mise à jour : `git add . && git commit && git push` pour redéployer
 - Bouton **GitHub Pages** (icône + label) dans la top bar, accessible depuis tous les écrans
 
 ---
