@@ -47,4 +47,4 @@ const R = {
 };
 
 // ── Session key helper ───────────────────────────────────────────────────────
-function getKey() { return sessionStorage.getItem("ux_pilot_key") || ""; }
+function getKey() { return localStorage.getItem("ux_pilot_key") || ""; }

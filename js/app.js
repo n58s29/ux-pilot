@@ -177,7 +177,7 @@ function ApiKeyModal({ onSave }) {
         <button className="btn-go" onClick={() => k.trim() && onSave(k.trim())} disabled={!k.trim()}>
           Démarrer la mission
         </button>
-        <div className="hint"><strong>BYOK</strong> — Clé stockée en sessionStorage. Effacée à la fermeture.</div>
+        <div className="hint"><strong>BYOK</strong> — Clé stockée en localStorage. Persiste entre les refreshs.</div>
       </div>
     </div>
   );
@@ -485,7 +485,7 @@ function App() {
 
   const reset = () => { setStep(-1); setRes({}); setTimes({}); setNeed(""); setTotalTime(null); setErr(null); };
 
-  if (!apiKey) return <ApiKeyModal onSave={k => { sessionStorage.setItem("ux_pilot_key", k); setApiKey(k); }} />;
+  if (!apiKey) return <ApiKeyModal onSave={k => { localStorage.setItem("ux_pilot_key", k); setApiKey(k); }} />;
 
   const inPipeline = step > -1 || Object.keys(res).length > 0;
 
@@ -493,7 +493,7 @@ function App() {
     <div style={{ display:"flex", height:"100vh", overflow:"hidden", background:"#0a0f1e" }}>
       {showTuto && <GithubPagesTuto onClose={() => setShowTuto(false)} />}
 
-      <Sidebar step={step} res={res} running={running} onStepClick={setStep} onResetKey={() => { sessionStorage.removeItem("ux_pilot_key"); setApiKey(""); }} />
+      <Sidebar step={step} res={res} running={running} onStepClick={setStep} onResetKey={() => { localStorage.removeItem("ux_pilot_key"); setApiKey(""); }} />
 
       <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
         {/* Top bar */}
