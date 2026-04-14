@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UX Pilot — Mission Control</title>
+  <meta name="description" content="Pipeline UX complet propulsé par IA. 8 étapes automatisées de la demande métier à la V1.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- React + Babel (CDN, no build step) -->
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.10/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!--
+    Script load order matters — each file runs in global scope via Babel,
+    so later files can reference symbols defined in earlier ones.
+
+    config.js  →  STEPS, EXAMPLES, FEATURES, R, getKey
+    api.js     →  callAPI, PR
+    views.js   →  CadrageView, PersonasView, StoriesView, JourneyView,
+                  ArchitectureView, HtmlPreview, RgaaView
+    app.js     →  App, ApiKeyModal, Sidebar, Landing, Pipeline + ReactDOM.createRoot
+  -->
+  <script type="text/babel" src="js/config.js"></script>
+  <script type="text/babel" src="js/api.js"></script>
+  <script type="text/babel" src="js/views.js"></script>
+  <script type="text/babel" src="js/app.js"></script>
+</body>
+</html>
