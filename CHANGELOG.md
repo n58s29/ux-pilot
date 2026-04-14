@@ -9,15 +9,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - `export.js` — générateur d'archive ZIP en fin de pipeline via JSZip (CDN)
-  - 8 pages HTML standalone stylées (dark theme, cohérent avec l'app) : cadrage, personas, user stories, parcours, architecture, wireframes, audit RGAA, V1 production
-  - Dossier `maquette/` avec séparation HTML / CSS / JS du wireframe basse fidélité
+  - `index.html` dashboard : navigation latérale entre tous les livrables (cadrage, personas, user stories, parcours, architecture, wireframes en iframe, audit RGAA), dark theme cohérent avec l'app
+  - Dossier `webapp/` contenant la V1 production, accessible depuis le dashboard via "Ouvrir l'app V1"
   - Téléchargement déclenché via `Blob` + `URL.createObjectURL`
 - Bouton **Télécharger les livrables (.zip)** dans le banner de fin de pipeline (avec état loading)
 - `GithubPagesTuto` — modale tutoriel statique (zéro appel LLM) pour déployer l'**app générée** sur GitHub Pages
-  - 5 étapes : télécharger les livrables → créer un repo → pousser `maquette/` → activer Pages → URL
+  - 5 étapes : télécharger les livrables → créer un repo → pousser → activer Pages → URL
   - Blocs de commandes git copiables en 1 clic (feedback visuel ✓)
-  - Astuce : déploiement alternatif via `08-v1-production.html` renommé en `index.html`
-  - Astuce mise à jour : `git add . && git commit && git push` pour redéployer
 - Bouton **GitHub Pages** (icône + label) dans la top bar, accessible depuis tous les écrans
 
 ---
