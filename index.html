@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UX Pilot — Gestion de projets</title>
+<title>ZENITH — Gestion de projets UX</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
@@ -1284,7 +1284,7 @@ function renderSidebar() { renderSidebarHead(); renderSidebarProjects(); }
 function renderSidebarHead() {
   document.getElementById('sidebar').innerHTML = `
     <div class="sb-head">
-      <div class="sb-logo">UX Pilot</div>
+      <div class="sb-logo">ZENITH</div>
       <div class="sb-tagline">Gestion de projets</div>
     </div>
     <div class="sb-search">
@@ -1337,7 +1337,7 @@ function renderMain() {
 
 function renderLanding() {
   return `<div class="landing">
-    <h1>UX Pilot</h1>
+    <h1>ZENITH</h1>
     <p>Accompagnez vos projets UX de la découverte au handoff. Créez un projet pour commencer.</p>
     <div class="landing-action">
       <button data-action="new-project">Nouveau projet</button>
@@ -1824,7 +1824,7 @@ function init() {
   renderMain();
   if (!S.apiKey) {
     setTimeout(() => {
-      showModal(`<div class="modal-title">Bienvenue sur UX Pilot</div>
+      showModal(`<div class="modal-title">Bienvenue sur ZENITH</div>
         <p style="font-size:13px;color:var(--fg-muted);margin-bottom:16px">Pour générer des livrables via l'IA, renseignez votre clé API Anthropic. Elle sera stockée uniquement dans votre navigateur.</p>
         <div class="form-field">
           <label class="form-label">Clé API Anthropic</label>
