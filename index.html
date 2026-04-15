@@ -1526,7 +1526,7 @@ function showModal(html) {
   const overlay = document.getElementById('modal-overlay');
   overlay.classList.remove('hidden');
   overlay.innerHTML = `<div class="modal">${html}</div>`;
-  overlay.querySelector('.modal').addEventListener('click', e => e.stopPropagation());
+  // Fermeture uniquement si clic sur l'overlay lui-même (géré dans le handler global)
   const firstInput = overlay.querySelector('input,textarea');
   if (firstInput) firstInput.focus();
 }
