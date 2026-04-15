@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UX Pilot — Gestion de projets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f8f7;
+  --fg:#111111;
+  --fg-muted:#6b7280;
+  --fg-subtle:#a1a1aa;
+  --border:#e4e4e7;
+  --border-light:#f0f0ee;
+  --surface:#ffffff;
+  --surface-hover:#f4f4f3;
+  --accent:#1e293b;
+  --accent-light:#f1f5f9;
+  --accent-hover:#334155;
+  --done-color:#166534;
+  --sidebar-w:220px;
+  --font:'Spectral',Georgia,serif;
+  --ease:150ms ease-out;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);font-size:14px;line-height:1.6;color:var(--fg);background:var(--bg)}
+#app{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+#sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);height:100vh;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
+.sb-head{padding:18px 16px 14px;border-bottom:1px solid var(--border-light)}
+.sb-logo{font-size:15px;font-weight:600;letter-spacing:-0.02em;color:var(--fg)}
+.sb-tagline{font-size:10px;color:var(--fg-subtle);letter-spacing:0.04em;margin-top:1px}
+.sb-search{padding:10px 12px;border-bottom:1px solid var(--border-light)}
+.sb-search input{width:100%;font-family:var(--font);font-size:12px;border:1px solid var(--border);border-radius:3px;padding:5px 9px;background:var(--bg);color:var(--fg);outline:none;transition:border-color var(--ease)}
+.sb-search input:focus{border-color:var(--accent)}
+.sb-search input::placeholder{color:var(--fg-subtle)}
+.sb-section{padding:10px 14px 4px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-subtle);font-weight:500}
+#project-list{flex:1;overflow-y:auto;padding:2px 0}
+.proj-item{display:flex;align-items:center;padding:7px 14px;cursor:pointer;font-size:13px;color:var(--fg-muted);transition:background var(--ease),color var(--ease);border-left:2px solid transparent;user-select:none;gap:6px}
+.proj-item:hover{background:var(--surface-hover);color:var(--fg)}
+.proj-item.active{color:var(--fg);font-weight:500;border-left-color:var(--accent);background:var(--accent-light)}
+.proj-item-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj-item-progress{font-size:10px;color:var(--fg-subtle);flex-shrink:0}
+.sb-footer{padding:10px 14px;border-top:1px solid var(--border-light);display:flex;flex-direction:column;gap:2px}
+.sb-footer button{font-family:var(--font);font-size:12px;padding:6px 0;text-align:left;background:none;border:none;color:var(--fg-muted);cursor:pointer;transition:color var(--ease);display:flex;align-items:center;gap:6px}
+.sb-footer button:hover{color:var(--fg)}
+.sb-footer .btn-new{color:var(--accent);font-weight:500}
+
+/* ── MAIN ── */
+#main{flex:1;overflow-y:auto;height:100vh}
+
+/* ── LANDING ── */
+.landing{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:48px;text-align:center}
+.landing h1{font-size:26px;font-weight:400;letter-spacing:-0.03em;margin-bottom:10px}
+.landing p{font-size:14px;color:var(--fg-muted);max-width:380px;line-height:1.65;margin-bottom:24px}
+.landing-action button{font-family:var(--font);font-size:13px;padding:9px 20px;border:1px solid var(--accent);border-radius:3px;background:var(--accent);color:#fff;cursor:pointer;transition:background var(--ease)}
+.landing-action button:hover{background:var(--accent-hover)}
+
+/* ── PROJECT HEADER ── */
+.proj-header{padding:28px 40px 20px;border-bottom:1px solid var(--border-light)}
+.proj-meta{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.proj-title{font-size:21px;font-weight:500;letter-spacing:-0.02em}
+.proj-type{font-size:12px;color:var(--fg-muted)}
+.proj-actions{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+.progress-wrap{margin-top:4px}
+.progress-label{font-size:11px;color:var(--fg-subtle);margin-bottom:5px;letter-spacing:0.02em}
+.progress-bar{height:2px;background:var(--border);border-radius:1px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:1px;transition:width 300ms ease-out}
+
+/* ── BREADCRUMB ── */
+.breadcrumb{padding:13px 40px;border-bottom:1px solid var(--border-light);font-size:12px;color:var(--fg-muted);display:flex;align-items:center;gap:6px}
+.breadcrumb a{color:var(--fg-muted);text-decoration:none;cursor:pointer}
+.breadcrumb a:hover{color:var(--fg);text-decoration:underline;text-underline-offset:2px}
+.bc-sep{color:var(--fg-subtle)}
+
+/* ── PHASES GRID ── */
+.phases-grid{padding:24px 40px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.phase-card{border:1px solid var(--border);border-radius:3px;padding:18px;cursor:pointer;transition:border-color var(--ease),background var(--ease);background:var(--surface)}
+.phase-card:hover{border-color:var(--fg-muted);background:var(--surface-hover)}
+.pc-num{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:7px}
+.pc-title{font-size:14px;font-weight:500;letter-spacing:-0.01em;margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--fg-muted);line-height:1.5;margin-bottom:14px}
+.pc-footer{display:flex;justify-content:space-between;align-items:center}
+.pc-status{font-size:11px;color:var(--fg-muted)}
+.pc-status.done{color:var(--done-color);font-weight:500}
+.pc-status.inprogress{font-weight:500}
+.pc-count{font-size:11px;color:var(--fg-subtle)}
+
+/* ── PHASE VIEW ── */
+.phase-head{padding:28px 40px 22px;border-bottom:1px solid var(--border)}
+.phase-head-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.ph-left .ph-num{font-size:10px;color:var(--fg-subtle);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px}
+.ph-left .ph-title{font-size:19px;font-weight:500;letter-spacing:-0.02em}
+.status-sel{font-family:var(--font);font-size:12px;border:1px solid var(--border);border-radius:3px;padding:5px 8px;background:var(--surface);color:var(--fg);cursor:pointer;outline:none;transition:border-color var(--ease)}
+.status-sel:focus{border-color:var(--accent)}
+.field-label{font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:7px;font-weight:500;display:block}
+.field-ta{width:100%;font-family:var(--font);font-size:13px;line-height:1.65;border:1px solid var(--border);border-radius:3px;padding:10px 12px;background:var(--surface);color:var(--fg);resize:vertical;outline:none;min-height:72px;transition:border-color var(--ease)}
+.field-ta:focus{border-color:var(--accent)}
+.field-ta::placeholder{color:var(--fg-subtle)}
+.phase-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* ── DELIVERABLES ── */
+.deliv-section{padding:0 40px 48px}
+.deliv-header-row{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-subtle);padding:22px 0 14px;font-weight:500;border-bottom:1px solid var(--border-light)}
+.deliv{border-bottom:1px solid var(--border-light);padding:18px 0}
+.deliv:last-child{border-bottom:none}
+.deliv-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:10px}
+.deliv-info .deliv-title{font-size:14px;font-weight:500;letter-spacing:-0.01em;margin-bottom:2px}
+.deliv-info .deliv-desc{font-size:12px;color:var(--fg-muted);font-style:italic}
+.deliv-btns{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.deliv-output{width:100%;font-family:var(--font);font-size:13px;line-height:1.7;border:1px solid var(--border);border-radius:3px;padding:14px;background:var(--bg);color:var(--fg);resize:vertical;outline:none;min-height:110px;transition:border-color var(--ease)}
+.deliv-output:focus{border-color:var(--accent);background:var(--surface)}
+.deliv-foot{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.deliv-ts{font-size:11px;color:var(--fg-subtle);font-style:italic}
+.deliv-copy-regen{display:flex;gap:8px}
+
+/* ── BUTTONS ── */
+.btn{font-family:var(--font);font-size:12px;padding:6px 13px;border-radius:3px;cursor:pointer;transition:all var(--ease);font-weight:400;line-height:1}
+.btn-primary{background:var(--accent);color:#fff;border:1px solid var(--accent)}
+.btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn-secondary{background:none;color:var(--fg-muted);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--surface-hover);color:var(--fg);border-color:var(--fg-subtle)}
+.btn-ghost{background:none;border:none;color:var(--fg-muted);font-family:var(--font);font-size:12px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;transition:color var(--ease)}
+.btn-ghost:hover{color:var(--fg)}
+.btn-danger-outline{font-family:var(--font);font-size:12px;padding:6px 13px;border:1px solid #fca5a5;color:#dc2626;border-radius:3px;cursor:pointer;background:none;transition:background var(--ease)}
+.btn-danger-outline:hover{background:#fee2e2}
+
+/* ── LOADING ── */
+.loading-wrap{padding:14px 0;display:flex;align-items:center;gap:8px;color:var(--fg-muted);font-size:12px}
+.dots{display:inline-flex;gap:3px}
+.dots span{width:4px;height:4px;background:var(--fg-muted);border-radius:50%;animation:dot 1.2s ease-in-out infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+/* ── SYNTHESIS ── */
+.synth-head{padding:28px 40px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start}
+.synth-head-left h2{font-size:20px;font-weight:500;letter-spacing:-0.02em}
+.synth-head-left p{font-size:13px;color:var(--fg-muted);margin-top:3px}
+.synth-actions{display:flex;gap:10px}
+.synth-body{padding:24px 40px 48px}
+.synth-phase{margin-bottom:36px}
+.synth-phase-title{font-size:13px;font-weight:500;padding:10px 0;border-bottom:1px solid var(--border);margin-bottom:14px;display:flex;align-items:center;gap:8px;letter-spacing:-0.01em}
+.synth-phase-num{font-size:10px;color:var(--fg-subtle);text-transform:uppercase;letter-spacing:.06em;font-weight:400}
+.synth-deliv{margin-bottom:18px}
+.synth-deliv-title{font-size:11px;font-weight:500;color:var(--fg-muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px;cursor:pointer;display:inline-block}
+.synth-deliv-title:hover{color:var(--fg);text-decoration:underline;text-underline-offset:2px}
+.synth-deliv-text{font-size:13px;line-height:1.65;color:var(--fg);white-space:pre-wrap;border-left:2px solid var(--border);padding-left:14px;max-height:220px;overflow:hidden;position:relative}
+.synth-deliv-text.expanded{max-height:none}
+.synth-expand{font-size:11px;color:var(--fg-muted);cursor:pointer;margin-top:4px;background:none;border:none;font-family:var(--font);text-decoration:underline;text-underline-offset:2px;padding:0}
+.synth-empty{color:var(--fg-subtle);font-size:13px;font-style:italic}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:100;animation:fadein .15s ease-out}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:26px;min-width:360px;max-width:460px;animation:slideup .15s ease-out}
+.modal-title{font-size:17px;font-weight:500;letter-spacing:-0.01em;margin-bottom:18px}
+.form-field{margin-bottom:14px}
+.form-label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-muted);margin-bottom:5px;display:block;font-weight:500}
+.form-input{width:100%;font-family:var(--font);font-size:14px;border:1px solid var(--border);border-radius:3px;padding:8px 11px;background:var(--surface);color:var(--fg);outline:none;transition:border-color var(--ease)}
+.form-input:focus{border-color:var(--accent)}
+.form-hint{font-size:11px;color:var(--fg-subtle);margin-top:4px;font-style:italic}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+.modal-sep{height:1px;background:var(--border-light);margin:16px 0}
+
+/* ── TOAST ── */
+#toast-container{position:fixed;bottom:22px;right:22px;z-index:200;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--fg);color:var(--surface);font-size:13px;padding:9px 16px;border-radius:3px;animation:slideup .15s ease-out;white-space:nowrap;font-family:var(--font)}
+.toast.out{animation:fadeout .3s ease-out forwards}
+
+/* ── EMPTY STATE ── */
+.empty-deliv{padding:16px 0;font-size:13px;color:var(--fg-subtle);font-style:italic}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* ── ANIMATIONS ── */
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes slideup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeout{to{opacity:0;transform:translateY(3px)}}
+
+/* ── PRINT ── */
+@media print{
+  #sidebar,.breadcrumb,.proj-actions,.deliv-btns,.deliv-btns,.deliv-foot,.phase-head-top .status-sel,.modal-overlay,#toast-container{display:none!important}
+  #app{display:block;height:auto}
+  #main{overflow:visible;height:auto}
+  body,html{height:auto;overflow:visible}
+  .synth-deliv-text{max-height:none}
+  .synth-deliv{page-break-inside:avoid}
+  .synth-phase{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar"></aside>
+  <main id="main"></main>
+</div>
+<div id="modal-overlay" class="modal-overlay hidden"></div>
+<div id="toast-container"></div>
+<script>
+// ════════════════════════════════════════════════════════════
+// CONFIGURATION — PHASES & DELIVERABLES
+// ════════════════════════════════════════════════════════════
+
+const PHASES_CONFIG = {
+  discovery:{number:1,id:'discovery',label:'Discovery & Cadrage',description:'Structuration du problème et définition du périmètre',
+    deliverables:{
+      problem_statement:{label:'Problem Statement',description:'Qui / Quoi / Pourquoi / Impact',maxTokens:2000},
+      research_plan:{label:'Research Plan',description:'Méthodes, profils à recruter, timeline',maxTokens:2000},
+      stakeholder_map:{label:'Stakeholder Map',description:'Parties prenantes, niveau d\'influence, attentes',maxTokens:2000},
+      jtbd_canvas:{label:'JTBD Canvas',description:'3 à 5 jobs-to-be-done avec contexte, motivation, résultat',maxTokens:2000}
+    }
+  },
+  research:{number:2,id:'research',label:'Research Utilisateur',description:'Collecte et analyse des données utilisateurs',
+    deliverables:{
+      interview_guide:{label:'Guide d\'entretien',description:'Questions ouvertes structurées par thème',maxTokens:2000},
+      synthesis_template:{label:'Synthesis Template',description:'Grille d\'analyse des entretiens',maxTokens:2000},
+      personas:{label:'Personas',description:'2 à 3 personas complets',maxTokens:3000},
+      journey_map:{label:'Journey Map',description:'Phases / actions / pensées / émotions / opportunités',maxTokens:3000},
+      insight_cards:{label:'Insight Cards',description:'5 à 8 insights clés avec implication design',maxTokens:2000}
+    }
+  },
+  ideation:{number:3,id:'ideation',label:'Idéation & Architecture',description:'Exploration des solutions et structure de l\'information',
+    deliverables:{
+      sitemap:{label:'Sitemap',description:'Arborescence textuelle en markdown indenté',maxTokens:2000},
+      user_flows:{label:'User Flows',description:'2 à 3 flux principaux avec étapes et bifurcations',maxTokens:2000},
+      design_principles:{label:'Design Principles',description:'4 à 6 principes directeurs du produit',maxTokens:2000},
+      hmw_questions:{label:'How Might We',description:'8 à 10 questions HMW issues des insights',maxTokens:2000},
+      concept_brief:{label:'Concept Brief',description:'Description du concept de solution',maxTokens:2000}
+    }
+  },
+  design:{number:4,id:'design',label:'Design UI & Prototypage',description:'Conception des interfaces et préparation du handoff',
+    deliverables:{
+      content_inventory:{label:'Content Inventory',description:'Contenus par écran/section avec type et priorité',maxTokens:2000},
+      annotation_template:{label:'Annotation Template',description:'Structure d\'annotation des maquettes',maxTokens:2000},
+      accessibility_checklist:{label:'Accessibility Checklist',description:'Checklist WCAG 2.2 adaptée au produit',maxTokens:2000},
+      motion_guidelines:{label:'Motion Guidelines',description:'Durées, easings et intentions par interaction',maxTokens:2000},
+      design_qa_checklist:{label:'Design QA Checklist',description:'Vérification avant handoff',maxTokens:2000}
+    }
+  },
+  testing:{number:5,id:'testing',label:'Tests Utilisateurs',description:'Validation de la solution avec les utilisateurs',
+    deliverables:{
+      test_plan:{label:'Test Plan',description:'Objectifs, scénarios, profils et métriques de succès',maxTokens:2000},
+      test_script:{label:'Script de test',description:'Introduction, tâches, débriefing',maxTokens:2000},
+      test_report:{label:'Rapport de test',description:'Contexte, résultats par tâche, recommandations',maxTokens:3000},
+      affinity_map:{label:'Affinity Map Template',description:'Catégories de regroupement des observations',maxTokens:2000},
+      prioritization_matrix:{label:'Prioritisation Matrix',description:'Grille impact/effort pour les corrections',maxTokens:2000}
+    }
+  },
+  handoff:{number:6,id:'handoff',label:'Handoff & Amélioration',description:'Transmission et suivi post-lancement',
+    deliverables:{
+      handoff_doc:{label:'Handoff Doc',description:'Documentation complète pour les développeurs',maxTokens:3000},
+      dev_checklist:{label:'Dev Checklist',description:'Vérification technique avant mise en production',maxTokens:2000},
+      ux_metrics_plan:{label:'UX Metrics Plan',description:'KPIs post-lancement avec méthode de mesure',maxTokens:2000},
+      post_launch_research:{label:'Post-Launch Research Plan',description:'Plan de continuous discovery',maxTokens:2000},
+      retrospective_template:{label:'Retrospective Template',description:'Bilan UX du projet',maxTokens:2000}
+    }
+  }
+};
+
+const PHASE_ORDER = ['discovery','research','ideation','design','testing','handoff'];
+const STATUS_LABELS = {todo:'À faire',inprogress:'En cours',done:'Terminé'};
+const STORAGE_KEY = 'ux_projects';
+const API_KEY_STORAGE = 'ux_api_key';
+const API_URL = 'https://api.anthropic.com/v1/messages';
+const MODEL = 'claude-sonnet-4-20250514';
+
+// ════════════════════════════════════════════════════════════
+// PROMPT BUILDER
+// ════════════════════════════════════════════════════════════
+
+function buildPrompt(phaseId, delivId, project, phase) {
+  const prevCtx = getPrevContext(project, phaseId);
+  const base = `\n\n---\nProjet : "${project.name}"${project.type ? ` (${project.type})` : ''}
+Contexte de phase : ${phase.context || 'Non renseigné'}
+Notes : ${phase.notes || 'Aucune'}${prevCtx}`;
+
+  const sys = `Tu es un expert UX designer et researcher. Génère des livrables professionnels, structurés et directement utilisables, en français. Réponds UNIQUEMENT avec le contenu du livrable en markdown — aucune introduction ni conclusion.`;
+
+  const userPrompts = {
+    discovery:{
+      problem_statement:`Génère un Problem Statement structuré.
+
+## Qui
+[Utilisateurs ou parties prenantes concernées — soyez précis]
+
+## Quoi
+[Problème observé ou besoin non satisfait]
+
+## Pourquoi
+[Causes racines, contexte, contraintes organisationnelles]
+
+## Impact
+[Conséquences pour les utilisateurs · Enjeux business]${base}`,
+
+      research_plan:`Génère un Research Plan complet.
+
+## Objectifs de recherche
+[3-4 questions clés auxquelles la recherche devra répondre]
+
+## Méthodes recommandées
+[Pour chaque méthode : nom · justification · durée estimée]
+
+## Profils à recruter
+[Critères de sélection, nombre de participants, sources de recrutement]
+
+## Timeline
+[Plan semaine par semaine]
+
+## Livrables attendus
+[Ce que produira la phase de recherche]${base}`,
+
+      stakeholder_map:`Génère une Stakeholder Map structurée.
+
+## Parties prenantes primaires
+| Rôle | Influence (H/M/F) | Attentes principales | Niveau d'implication souhaité |
+|------|-------------------|---------------------|-------------------------------|
+[Compléter]
+
+## Parties prenantes secondaires
+[Même format]
+
+## Utilisateurs finaux
+[Description des segments d'utilisateurs concernés]
+
+## Points de tension potentiels
+[Conflits d'intérêts ou priorités divergentes à anticiper]${base}`,
+
+      jtbd_canvas:`Génère un JTBD Canvas avec 4-5 jobs-to-be-done.
+
+Pour chaque job :
+
+### Job [N] — [Intitulé court]
+**Contexte déclencheur** : [Situation qui pousse l'utilisateur à agir]
+**Motivation principale** : [Ce que l'utilisateur cherche vraiment à accomplir]
+**Résultat attendu** : [Critère de succès du point de vue utilisateur]
+**Obstacles actuels** : [Ce qui empêche d'y parvenir aujourd'hui]
+**Opportunité design** : [Comment le produit peut répondre à ce job]${base}`
+    },
+    research:{
+      interview_guide:`Génère un Guide d'entretien utilisateur complet.
+
+## Introduction (5 min)
+[Script d'accueil, présentation, mise à l'aise, accord d'enregistrement]
+
+## Contexte utilisateur (10 min)
+[5 questions sur le profil, l'environnement, les habitudes actuelles]
+
+## Thème 1 — [Thème principal] (15 min)
+[5-6 questions ouvertes avec relances potentielles]
+
+## Thème 2 — [Thème secondaire] (10 min)
+[4-5 questions ouvertes]
+
+## Frictions & besoins (10 min)
+[5 questions sur les points de douleur et aspirations]
+
+## Clôture (5 min)
+[Questions de synthèse, remerciements]${base}`,
+
+      synthesis_template:`Génère un Synthesis Template pour analyser les entretiens.
+
+## Fiche participant [N]
+**Profil** : [Âge, rôle, contexte] · **Date** : [Date] · **Durée** : [X min]
+
+### Observations clés
+| Thème | Observation | Citation verbatim | Émotion/Intensité |
+|-------|-------------|------------------|-------------------|
+
+### Patterns identifiés
+[Liste de comportements ou attitudes récurrents]
+
+### Points de friction
+[Liste numérotée par criticité]
+
+### Moments de satisfaction
+[Expériences positives évoquées]
+
+### Hypothèses à valider
+[Ce qui mérite approfondissement]
+
+---
+
+## Template de clustering transversal
+[Catégories : Pains · Gains · Contextes · Comportements · Besoins latents]${base}`,
+
+      personas:`Génère 2-3 personas utilisateurs réalistes et actionnables.
+
+Pour chaque persona :
+
+---
+### Persona [N] — [Prénom Nom]
+**Âge** : [X ans] · **Rôle** : [Poste] · **Contexte** : [Environnement de travail/vie]
+
+> "[Citation clé qui capture sa vision ou frustration principale]"
+
+**Quotidien**
+[2-3 phrases sur ses habitudes, outils, contexte]
+
+**Objectifs**
+- [Objectif principal]
+- [Objectif secondaire]
+- [Objectif latent ou implicite]
+
+**Frustrations**
+- [Frustration 1]
+- [Frustration 2]
+- [Frustration 3]
+
+**Rapport au numérique**
+[Niveau de maîtrise, appareils, usages]
+
+**Ce qu'il·elle attend du produit**
+[En 2-3 phrases concrètes]${base}`,
+
+      journey_map:`Génère une Journey Map textuelle complète pour le parcours principal.
+
+## Contexte
+**Persona** : [Persona ciblé]
+**Scénario** : [Description]
+**Objectif** : [Ce que l'utilisateur cherche à accomplir]
+
+## Parcours (5-7 phases)
+
+### Phase [N] — [Nom]
+**Actions** : [Ce que l'utilisateur fait]
+**Pensées** : [Questions, doutes, raisonnements]
+**Émotions** : [État émotionnel — ex : curieux · frustré · soulagé]
+**Points de contact** : [Canaux, interfaces, personnes]
+**Frictions** : [Ce qui bloque ou déçoit]
+**Opportunités** : [Pistes d'amélioration]
+
+[Répéter pour toutes les phases]
+
+## Moments de vérité
+[2-3 moments critiques qui font ou défont l'expérience]
+
+## Recommandations prioritaires
+[Top 5 actions design]${base}`,
+
+      insight_cards:`Génère 6-8 Insight Cards issues de la phase de recherche.
+
+### Insight [N] — [Titre court et mémorable]
+**Description** : [Observation factuelle — 2 phrases max]
+**Citation témoin** : > "[Citation représentative]"
+**Fréquence** : [Récurrence parmi les participants]
+**Implication design** : [Ce que ça implique concrètement pour le produit]
+**Priorité** : Critique / Haute / Moyenne${base}`
+    },
+    ideation:{
+      sitemap:`Génère un Sitemap en markdown indenté.
+
+# [Nom du produit]
+
+## 0. Authentification
+  - 0.1 Connexion
+  - 0.2 Création de compte
+  - 0.3 Récupération mot de passe
+
+## 1. [Section principale]
+  - 1.1 [Page/Vue]
+    - 1.1.1 [Sous-vue]
+  - 1.2 [Page/Vue]
+
+[Continuer pour toutes les sections]
+
+## X. Paramètres & Profil
+  - X.1 Profil utilisateur
+  - X.2 Préférences
+
+---
+**Note d'architecture** : [Observations, alternatives envisagées, points d'attention]${base}`,
+
+      user_flows:`Génère les 3 user flows principaux en format textuel structuré.
+
+Pour chaque flow :
+
+---
+## Flow [N] — [Nom du flux]
+**Déclencheur** : [Ce qui initie le flow]
+**Persona** : [Qui réalise ce flux]
+**Objectif** : [Ce que l'utilisateur cherche à accomplir]
+
+### Étapes
+1. [Action utilisateur]
+   → Résultat : [Ce que le système affiche/fait]
+   ⚠ [Règle de gestion ou cas limite si pertinent]
+
+2. [Action utilisateur]
+   → Résultat : [...]
+   ↳ Si [condition] → [Bifurcation A]
+   ↳ Si [condition] → [Bifurcation B]
+
+[Continuer jusqu'à la fin]
+
+**Succès** : [État final positif]
+**Cas d'erreur** : [2-3 cas d'erreur à gérer]${base}`,
+
+      design_principles:`Génère 5 principes de design spécifiques à ce projet.
+
+### Principe [N] — "[Nom court et mémorable]"
+**Ce que ça signifie** : [Définition concrète — 2 phrases]
+**Ce que ça implique** : [Conséquences sur les décisions design]
+**Ce que ça exclut** : [Ce qu'on ne fera pas en vertu de ce principe]
+**Exemple concret** : [Illustration sur ce projet]${base}`,
+
+      hmw_questions:`Génère 10 questions "How Might We" pour la phase d'idéation.
+
+## Autour des besoins utilisateurs
+- HMW [question]
+- HMW [question]
+- HMW [question]
+
+## Autour des frictions identifiées
+- HMW [question]
+- HMW [question]
+- HMW [question]
+
+## Autour des opportunités systémiques
+- HMW [question]
+- HMW [question]
+
+## Ambitieuses (think big)
+- HMW [question]
+- HMW [question]${base}`,
+
+      concept_brief:`Génère un Concept Brief pour la solution retenue.
+
+## Titre du concept
+[Nom mémorable]
+
+## Problème adressé
+[Rappel synthétique du problème — 3 lignes max]
+
+## L'idée centrale
+[Description du concept en 5-6 phrases : ce que c'est, comment ça marche, pourquoi c'est pertinent]
+
+## Valeur pour l'utilisateur
+[Ce que l'utilisateur gagne — format Avant / Après]
+
+## Différenciation
+[En quoi cette approche se distingue des solutions existantes]
+
+## Hypothèses à valider
+[Ce qu'il faut tester pour confirmer la direction]
+
+## Contraintes et risques
+[Ce qui pourrait mettre le concept en péril]
+
+## Prochaines étapes
+[Actions concrètes pour passer au design]${base}`
+    },
+    design:{
+      content_inventory:`Génère un Content Inventory par écran.
+
+## [Écran 1 — Nom]
+| Élément | Type | Source | Priorité | Notes |
+|---------|------|--------|----------|-------|
+| [Titre] | Texte | Copywriter | P1 | Max 60 car. |
+| [Image] | Image | Banque | P2 | Format 16:9 |
+[Continuer...]
+
+## [Écran 2]
+[Même format]
+
+---
+## Règles éditoriales
+[Ton, longueurs recommandées, contraintes]
+
+## Assets à produire
+[Liste des assets graphiques, icônes, illustrations]${base}`,
+
+      annotation_template:`Génère un Annotation Template pour les maquettes.
+
+## Structure d'annotation standard
+
+### [N] — [Nom du composant]
+
+**Comportement par défaut** : [État normal]
+
+**États à documenter** :
+- Vide (empty state)
+- Chargement (loading)
+- Erreur
+- Succès
+- Désactivé
+
+**Interactions** :
+| Action | Déclencheur | Résultat | Animation |
+|--------|-------------|----------|-----------|
+| Clic | Bouton CTA | [Action] | Fade 150ms |
+
+**Règles de contenu** :
+- Longueur max : X caractères
+- Débordement : troncature + ellipse
+- Placeholder : "[Texte]"
+
+**Accessibilité** :
+- Rôle ARIA : [role]
+- Label : [aria-label]
+- Focus clavier : [comportement]
+
+**Responsive** :
+| Breakpoint | Comportement |
+|------------|--------------|
+| < 768px | [Adaptation mobile] |
+| > 1024px | [Desktop par défaut] |
+
+---
+## Conventions de nommage
+[Règles pour calques, composants, annotations]${base}`,
+
+      accessibility_checklist:`Génère une Accessibility Checklist WCAG 2.2 adaptée à ce projet.
+
+## Niveau A — Obligatoire
+
+### Perceptible
+- [ ] 1.1.1 — Alt text sur toutes les images non décoratives
+- [ ] 1.3.1 — Structure sémantique correcte (headings, listes, tableaux)
+- [ ] 1.4.1 — Information non transmise par la couleur seule
+
+### Utilisable
+- [ ] 2.1.1 — Toutes les fonctionnalités accessibles au clavier
+- [ ] 2.4.1 — Mécanisme pour passer le contenu répété
+- [ ] 2.4.3 — Ordre de focus logique
+
+### Compréhensible
+- [ ] 3.1.1 — Attribut lang correct sur la page
+- [ ] 3.3.1 — Erreurs de saisie identifiées et décrites
+
+### Robuste
+- [ ] 4.1.2 — Nom, rôle, valeur pour tous les composants UI
+
+## Niveau AA — Recommandé
+- [ ] 1.4.3 — Contraste texte normal ≥ 4.5:1
+- [ ] 1.4.4 — Texte redimensionnable jusqu'à 200%
+- [ ] 1.4.11 — Contraste composants UI ≥ 3:1
+- [ ] 2.4.7 — Focus visible
+- [ ] 2.5.3 — Label dans le nom accessible
+
+## Points de vigilance spécifiques
+[4-5 critères particulièrement critiques pour ce type de produit]
+
+## Outils recommandés
+[axe DevTools, Lighthouse, Colour Contrast Analyser, NVDA/VoiceOver]${base}`,
+
+      motion_guidelines:`Génère des Motion Guidelines complètes pour ce produit.
+
+## Principes directeurs
+[3-4 principes qui guident toutes les décisions de motion]
+
+## Tokens d'animation
+
+### Durées
+| Token | Valeur | Usage |
+|-------|--------|-------|
+| fast | 100ms | Hover, focus, micro-interactions |
+| normal | 200ms | Transitions d'état |
+| slow | 350ms | Entrées/sorties d'éléments |
+| deliberate | 500ms | Transitions de page |
+
+### Easings
+| Token | Valeur cubic-bezier | Usage |
+|-------|--------------------|----|
+| ease-out | (0, 0, 0.2, 1) | Entrées d'éléments |
+| ease-in | (0.4, 0, 1, 1) | Sorties d'éléments |
+| ease-in-out | (0.4, 0, 0.2, 1) | Transitions bidirectionnelles |
+
+## Patterns par type d'interaction
+
+### Navigation & transitions de page
+[Règles spécifiques]
+
+### Apparitions / Disparitions
+[Fade, translate, scale — règles précises]
+
+### Feedback & états
+[Hover, focus, active, loading, error, success]
+
+### Squelettes de chargement
+[Règles pour les skeleton screens]
+
+## Accessibilité motion
+[Comportement avec prefers-reduced-motion]${base}`,
+
+      design_qa_checklist:`Génère une Design QA Checklist avant handoff.
+
+## Fichiers et organisation
+- [ ] Frames nommées de manière cohérente et prévisible
+- [ ] Composants extraits et documentés dans la bibliothèque
+- [ ] Styles (couleurs, typo, ombres) définis comme styles Figma
+- [ ] Pas de valeurs codées en dur hors du design system
+
+## Contenu et textes
+- [ ] Aucun "Lorem ipsum" — textes réels ou représentatifs
+- [ ] Longueurs min/max testées sur tous les champs
+- [ ] Textes validés (orthographe, ton, longueur)
+
+## États et interactions
+- [ ] Tous les états maquettés : default · hover · focus · active · disabled · loading · error · empty · success
+- [ ] Animations décrites ou prototypées
+
+## Responsive
+- [ ] Designs vérifiés sur les breakpoints définis
+- [ ] Pas de contenu coupé ou chevauchement
+- [ ] Zones de clic ≥ 44×44px sur mobile
+
+## Accessibilité
+- [ ] Contrastes vérifiés (≥ 4.5:1 pour le texte)
+- [ ] Ordre de lecture logique documenté
+- [ ] Focus states visibles sur tous les éléments interactifs
+
+## Cohérence système de design
+- [ ] Uniquement les composants de la bibliothèque
+- [ ] Pas de dérives de couleurs hors palette
+- [ ] Espacements conformes à la grille${base}`
+    },
+    testing:{
+      test_plan:`Génère un Test Plan complet.
+
+## Objectifs du test
+[3-4 questions auxquelles ce test doit répondre]
+
+## Périmètre
+| On teste | On ne teste pas |
+|----------|----------------|
+| [Scope] | [Hors scope] |
+
+## Méthode
+**Type** : [Modéré / Non-modéré / Guerrilla]
+**Prototype** : [Niveau de fidélité et outil]
+**Durée / session** : [X min]
+**Nombre de sessions** : [N]
+
+## Profils à recruter
+[Critères, sources, questions de screening]
+
+## Scénarios de test
+
+### Scénario 1 — [Nom]
+**Mise en situation** : [Contexte donné au participant]
+**Tâche** : "[Formulation exacte — sans indices sur le chemin]"
+**Critère de succès** : [Comment on sait que c'est réussi]
+
+[Répéter pour 3-5 scénarios]
+
+## Métriques de succès
+| Métrique | Cible | Méthode |
+|---------|-------|---------|
+| Taux de complétion | ≥ 80% | Observation |
+| Temps sur tâche | < X min | Chronomètre |
+| Erreurs critiques | 0 | Observation |
+| SUS | ≥ 70 | Questionnaire |${base}`,
+
+      test_script:`Génère un Script de test utilisateur complet.
+
+## Préparation (Modérateur — non lu à voix haute)
+[Checklist : prototype, enregistrement, prise de notes]
+
+## Introduction (5 min)
+"Bonjour, je m'appelle [Nom]. Merci de participer..."
+[Script verbatim : processus, accord enregistrement, consigne "on teste le produit pas vous"]
+
+## Mise en contexte (5 min)
+1. [Question profil]
+2. [Question habitudes actuelles]
+3. [Question outils utilisés]
+
+## Tâches
+
+### Tâche 1 — [Nom]
+**Mise en situation** :
+"[Contexte à lire]"
+
+**Consigne** :
+"[Tâche — sans indices sur le chemin]"
+
+**Points à observer** :
+- [ ] [Point d'attention]
+- [ ] [Point d'attention]
+
+**Questions post-tâche** :
+- "Qu'avez-vous trouvé facile ou difficile ?"
+- [Question spécifique]
+
+[Répéter pour chaque tâche]
+
+## Débriefing (10 min)
+1. "Globalement, comment avez-vous trouvé cette expérience ?"
+2. "Qu'est-ce qui vous a surpris ?"
+3. "Si vous pouviez changer une chose ?"
+
+## Clôture
+[Remerciements, prochaines étapes]${base}`,
+
+      test_report:`Génère la structure d'un Rapport de tests utilisateurs.
+
+# Rapport de tests — ${project ? project.name : '[Projet]'}
+**Date** : [Date] · **Sessions** : N · **Méthode** : [Type]
+
+## Résumé exécutif
+- [Problème critique 1]
+- [Problème critique 2]
+- Taux de succès global : X%
+- [Recommandation prioritaire]
+
+## Contexte & Objectifs
+[Rappel des objectifs — 1 paragraphe]
+
+## Méthodologie
+[Participants, protocole, durée, outils]
+
+## Résultats par tâche
+
+### Tâche [N] — [Nom]
+**Complétion** : X/N · **Temps moyen** : X min
+
+**Observations** :
+- [Observation 1]
+- [Observation 2]
+
+> "[Citation représentative]"
+
+**Problèmes** : [Liste avec sévérité]
+
+[Répéter pour chaque tâche]
+
+## Patterns transversaux
+[Thèmes récurrents]
+
+## Problèmes priorisés
+| # | Problème | Sévérité | Fréquence | Action |
+|---|---------|----------|-----------|--------|
+| 1 | [Description] | Critique | 4/5 | [Recommandation] |
+
+## Recommandations
+### P1 — Immédiat
+### P2 — Prochaine itération
+### P3 — Backlog
+
+## Prochaines étapes
+[Actions concrètes]${base}`,
+
+      affinity_map:`Génère un Affinity Map Template structuré.
+
+## Instructions
+[Process en 4 étapes pour le clustering]
+
+## Groupes de regroupement
+
+### Groupe A — [Frictions & obstacles]
+**Définition** : [Ce qui va dans ce groupe]
+**Sous-catégories** : [Liste]
+
+### Groupe B — [Comportements & usages]
+[Même format]
+
+### Groupe C — [Attentes & désirs]
+[Même format]
+
+### Groupe D — [Satisfactions & succès]
+[Même format]
+
+### Groupe E — [Opportunités & idées]
+[Même format]
+
+## Grille de priorisation
+| Observation | Fréquence (H/M/F) | Impact (H/M/F) | Actionnable |
+|-------------|-------------------|----------------|-------------|
+
+## Questions de synthèse
+[5 questions à se poser après le clustering]${base}`,
+
+      prioritization_matrix:`Génère une Prioritisation Matrix pour les corrections.
+
+## Critères d'évaluation
+
+### Impact utilisateur (1-5)
+| Score | Définition |
+|-------|-----------|
+| 5 | Bloquant — empêche la tâche |
+| 4 | Critique — erreur ou forte frustration |
+| 3 | Significatif — ralentit l'expérience |
+| 2 | Mineur — gêne légère |
+| 1 | Cosmétique |
+
+### Effort de résolution (1-5)
+[Même format pour l'effort]
+
+## Matrice
+
+### 🔴 Quick wins (Impact élevé · Effort faible)
+| # | Problème | Impact | Effort | Sprint |
+|---|---------|--------|--------|--------|
+
+### 🟡 Projets majeurs (Impact élevé · Effort élevé)
+[Même format]
+
+### 🟢 Remplissage (Impact faible · Effort faible)
+[Même format]
+
+### ⬜ À déprioritiser
+[Même format]
+
+## Roadmap recommandée
+[Plan sur 3 sprints]${base}`
+    },
+    handoff:{
+      handoff_doc:`Génère un Handoff Document complet pour les développeurs.
+
+# Handoff — ${project ? project.name : '[Projet]'}
+**Version** : 1.0 · **Date** : [Date] · **Designer** : [Nom]
+
+## Vue d'ensemble
+[Description du produit, objectif, périmètre de cette version — 4 phrases]
+
+## Architecture & Navigation
+[Résumé de la structure et des flux principaux]
+
+## Design Tokens
+
+### Couleurs
+| Token | Valeur | Usage |
+|-------|--------|-------|
+| --color-primary | #[HEX] | Actions principales |
+[Compléter]
+
+### Typographie
+| Token | Valeur | Usage |
+|-------|--------|-------|
+[Compléter]
+
+### Espacements
+[Grille et système d'espacement]
+
+## Composants clés
+
+### [Nom du composant]
+- **Variantes** : [Liste]
+- **États** : [Liste]
+- **Accessibilité** : [Notes]
+
+## Interactions & Animations
+[Référence aux Motion Guidelines]
+
+## Edge Cases documentés
+[Cas limites critiques à gérer]
+
+## Ressources
+- Figma : [URL]
+- Design System : [URL]${base}`,
+
+      dev_checklist:`Génère une Dev Checklist pour les développeurs.
+
+## Avant de commencer
+- [ ] Lire le Handoff Document en entier
+- [ ] Accès au fichier Figma et Design System vérifié
+- [ ] Points flous clarifiés avec le designer AVANT de coder
+- [ ] Dépendances identifiées
+
+## Fidélité visuelle
+- [ ] Espacements conformes à la grille (pas d'arrondi)
+- [ ] Couleurs tirées des Design Tokens uniquement
+- [ ] Typographie : tailles, poids, interlignes conformes
+- [ ] États hover/focus/active implémentés
+
+## Responsive
+- [ ] Testé sur les breakpoints définis
+- [ ] Pas de contenu coupé sur petits écrans
+- [ ] Zones de clic ≥ 44×44px sur mobile
+
+## Accessibilité
+- [ ] Alt text sur toutes les images
+- [ ] Structure heading logique
+- [ ] Navigation clavier fonctionnelle (Tab, Enter, Espace, Échap)
+- [ ] Focus visible sur tous les éléments interactifs
+- [ ] ARIA roles et labels en place
+- [ ] Contraste vérifié
+
+## Performance
+- [ ] Images optimisées (WebP, lazy loading)
+- [ ] prefers-reduced-motion respecté
+
+## Avant mise en production
+- [ ] Test cross-browser (Chrome, Firefox, Safari)
+- [ ] Test sur appareils réels si mobile
+- [ ] Lighthouse : Performance > 90, Accessibility > 90
+- [ ] Aucune erreur console
+- [ ] Démo au designer pour validation finale${base}`,
+
+      ux_metrics_plan:`Génère un UX Metrics Plan post-lancement.
+
+## Framework de mesure
+[HEART framework ou autre — justification]
+
+## KPIs
+
+### Happiness (Satisfaction)
+| Métrique | Source | Fréquence | Cible | Alerte si |
+|---------|--------|-----------|-------|-----------|
+| CSAT | Enquête in-app | Mensuel | ≥ 4/5 | < 3.5 |
+| NPS | Email | Trimestriel | ≥ 30 | < 10 |
+
+### Engagement
+[Même format]
+
+### Adoption
+[Même format]
+
+### Retention
+[Même format]
+
+### Task Success
+[Même format]
+
+## Outils recommandés
+[Analytics, heatmaps, session recording, enquêtes]
+
+## Événements à tracker
+| Événement | Propriétés | Déclencheur |
+|-----------|------------|-------------|
+| feature_used | name, user_id | Utilisation |
+
+## Seuils d'alerte et protocole de réaction
+[Quand et comment réagir aux métriques dégradées]
+
+## Revue mensuelle UX
+[Agenda et participants]${base}`,
+
+      post_launch_research:`Génère un Post-Launch Research Plan de continuous discovery.
+
+## Objectifs
+[Ce qu'on cherche à apprendre après le lancement]
+
+## Cadences de recherche
+
+### Hebdomadaire — Écoute passive
+- [Tickets support — analyse 30 min/semaine]
+- [Retours in-app]
+
+### Mensuelle — Recherche active
+- [3-4 interviews utilisateurs]
+- [Focus thématique tournant]
+
+### Trimestrielle — Bilan
+- [Revue métriques + insights]
+- [Réorientation priorités]
+
+## Méthodes par type de question
+| Question | Méthode | Effort | Fréquence |
+|----------|---------|--------|-----------|
+| Est-ce que X est utilisé ? | Analytics | Faible | Continu |
+| Pourquoi X est abandonné ? | Interviews | Moyen | Si alerte |
+
+## Critères de déclenchement d'une étude approfondie
+[Seuils métriques et signaux qualitatifs]
+
+## Organisation et partage des insights
+[Documentation, diffusion, prises de décision]
+
+## Rôles et responsabilités
+[Qui fait quoi dans le continuous discovery]${base}`,
+
+      retrospective_template:`Génère un Retrospective Template UX pour clôturer le projet.
+
+# Rétrospective UX — ${project ? project.name : '[Projet]'}
+**Date** : [Date] · **Participants** : [Noms] · **Durée** : 90 min
+
+## Mise en contexte (10 min)
+[Rappel des objectifs initiaux, périmètre, timeline]
+
+## Ce qui a bien fonctionné ✓ (20 min)
+### Process
+- [À remplir]
+
+### Livrables
+- [À remplir]
+
+### Collaboration
+- [À remplir]
+
+## Ce qui était difficile ⚡ (20 min)
+### Contraintes subies
+- [À remplir]
+
+### Erreurs de process
+- [À remplir]
+
+### Lacunes identifiées
+- [À remplir]
+
+## Ce qu'on ferait différemment ↺ (20 min)
+| Situation | Ce qu'on a fait | Ce qu'on ferait à la place |
+|-----------|-----------------|---------------------------|
+| [Exemple] | [Action] | [Alternative] |
+
+## Apprentissages clés (10 min)
+1.
+2.
+3.
+4.
+5.
+
+## Actions pour le prochain projet (10 min)
+| Action | Responsable | Échéance |
+|--------|-------------|----------|
+| [Action concrète] | [Qui] | [Quand] |${base}`
+    }
+  };
+
+  const up = userPrompts[phaseId]?.[delivId];
+  if (!up) return null;
+  return { system: sys, user: up };
+}
+
+function getPrevContext(project, currentPhaseId) {
+  const idx = PHASE_ORDER.indexOf(currentPhaseId);
+  if (idx <= 0) return '';
+  let parts = [];
+  for (let i = 0; i < idx; i++) {
+    const phKey = PHASE_ORDER[i];
+    const ph = project.phases[phKey];
+    if (!ph) continue;
+    const phConf = PHASES_CONFIG[phKey];
+    const delivs = Object.entries(ph.deliverables || {})
+      .filter(([,d]) => d && d.content)
+      .map(([k,d]) => `### ${phConf.deliverables[k]?.label || k}\n${d.content}`)
+      .join('\n\n');
+    if (delivs) parts.push(`## Phase ${phConf.number} — ${phConf.label}\n\n${delivs}`);
+  }
+  return parts.length ? '\n\n---\nLivrables des phases précédentes :\n\n' + parts.join('\n\n') : '';
+}
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+
+let S = {
+  projects: [],
+  currentId: null,
+  currentPhase: null, // null = phases overview, string = phase id, 'synthesis' = synthesis
+  loading: {}, // 'phaseId.delivId': true
+  apiKey: '',
+  search: ''
+};
+
+// ════════════════════════════════════════════════════════════
+// STORAGE
+// ════════════════════════════════════════════════════════════
+
+function load() {
+  S.apiKey = localStorage.getItem(API_KEY_STORAGE) || '';
+  try { S.projects = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { S.projects = []; }
+}
+function saveProjects() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(S.projects));
+}
+function saveApiKey(k) {
+  S.apiKey = k;
+  localStorage.setItem(API_KEY_STORAGE, k);
+}
+
+// ════════════════════════════════════════════════════════════
+// PROJECT CRUD
+// ════════════════════════════════════════════════════════════
+
+function uuid() {
+  return crypto.randomUUID ? crypto.randomUUID() :
+    'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16);
+    });
+}
+
+function emptyPhase() { return {status:'todo',context:'',notes:'',deliverables:{}}; }
+
+function createProject(name, type='') {
+  const now = new Date().toISOString();
+  const p = {
+    id: uuid(), name, type, createdAt: now, updatedAt: now,
+    phases: {}
+  };
+  PHASE_ORDER.forEach(k => { p.phases[k] = emptyPhase(); });
+  S.projects.unshift(p);
+  saveProjects();
+  return p;
+}
+
+function getProject(id) { return S.projects.find(p => p.id === id); }
+
+function updateProject(id, fn) {
+  const p = getProject(id);
+  if (!p) return;
+  fn(p);
+  p.updatedAt = new Date().toISOString();
+  saveProjects();
+}
+
+function deleteProject(id) {
+  S.projects = S.projects.filter(p => p.id !== id);
+  saveProjects();
+}
+
+function countDone(project) {
+  return PHASE_ORDER.filter(k => project.phases[k]?.status === 'done').length;
+}
+
+function countDeliverables(project, phaseId) {
+  const phase = project.phases[phaseId];
+  if (!phase) return [0,0];
+  const conf = PHASES_CONFIG[phaseId];
+  const total = Object.keys(conf.deliverables).length;
+  const done = Object.values(phase.deliverables || {}).filter(d => d && d.content).length;
+  return [done, total];
+}
+
+// ════════════════════════════════════════════════════════════
+// API
+// ════════════════════════════════════════════════════════════
+
+async function generateDeliverable(projectId, phaseId, delivId) {
+  if (!S.apiKey) { showSettings(); toast('Configurez votre clé API dans les réglages'); return; }
+  const project = getProject(projectId);
+  if (!project) return;
+  const phase = project.phases[phaseId];
+  const phConf = PHASES_CONFIG[phaseId];
+  const delivConf = phConf.deliverables[delivId];
+  const loadKey = `${phaseId}.${delivId}`;
+
+  S.loading[loadKey] = true;
+  renderDeliverable(projectId, phaseId, delivId);
+
+  const prompt = buildPrompt(phaseId, delivId, project, phase);
+  if (!prompt) { S.loading[loadKey] = false; renderDeliverable(projectId, phaseId, delivId); return; }
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': S.apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: delivConf.maxTokens,
+        temperature: 0.7,
+        system: prompt.system,
+        messages: [{ role: 'user', content: prompt.user }]
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
+    const content = data.content?.[0]?.text || '';
+    updateProject(projectId, p => {
+      if (!p.phases[phaseId].deliverables[delivId]) p.phases[phaseId].deliverables[delivId] = {};
+      p.phases[phaseId].deliverables[delivId].content = content;
+      p.phases[phaseId].deliverables[delivId].generatedAt = new Date().toISOString();
+    });
+    toast('Livrable généré');
+  } catch(e) {
+    toast('Erreur : ' + e.message);
+  } finally {
+    S.loading[loadKey] = false;
+    renderDeliverable(projectId, phaseId, delivId);
+    renderSidebarProjects();
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// RENDERING
+// ════════════════════════════════════════════════════════════
+
+function renderAll() { renderSidebar(); renderMain(); }
+function renderSidebar() { renderSidebarHead(); renderSidebarProjects(); }
+
+function renderSidebarHead() {
+  document.getElementById('sidebar').innerHTML = `
+    <div class="sb-head">
+      <div class="sb-logo">UX Pilot</div>
+      <div class="sb-tagline">Gestion de projets</div>
+    </div>
+    <div class="sb-search">
+      <input type="text" id="search-input" placeholder="Rechercher un projet…" value="${esc(S.search)}">
+    </div>
+    <div class="sb-section">Projets</div>
+    <div id="project-list"></div>
+    <div class="sb-footer">
+      <button class="btn-new" data-action="new-project">+ Nouveau projet</button>
+      <button data-action="import-project">⬆ Importer (JSON)</button>
+      <button data-action="open-settings">⚙ Réglages API</button>
+    </div>
+    <input type="file" id="import-file" accept=".json" style="display:none">
+  `;
+  document.getElementById('search-input').addEventListener('input', e => {
+    S.search = e.target.value;
+    renderSidebarProjects();
+  });
+}
+
+function renderSidebarProjects() {
+  const list = document.getElementById('project-list');
+  if (!list) return;
+  const filtered = S.projects.filter(p =>
+    !S.search || p.name.toLowerCase().includes(S.search.toLowerCase())
+  );
+  if (filtered.length === 0) {
+    list.innerHTML = `<div style="padding:14px 14px;font-size:12px;color:var(--fg-subtle);font-style:italic">${S.projects.length === 0 ? 'Aucun projet — créez-en un' : 'Aucun résultat'}</div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(p => {
+    const done = countDone(p);
+    const isActive = p.id === S.currentId;
+    return `<div class="proj-item ${isActive ? 'active' : ''}" data-action="select-project" data-id="${p.id}">
+      <span class="proj-item-name">${esc(p.name)}</span>
+      <span class="proj-item-progress">${done}/6</span>
+    </div>`;
+  }).join('');
+}
+
+function renderMain() {
+  const main = document.getElementById('main');
+  if (!S.currentId) { main.innerHTML = renderLanding(); return; }
+  const project = getProject(S.currentId);
+  if (!project) { main.innerHTML = renderLanding(); return; }
+  if (S.currentPhase === 'synthesis') { main.innerHTML = renderSynthesis(project); return; }
+  if (S.currentPhase) { main.innerHTML = renderPhaseView(project, S.currentPhase); return; }
+  main.innerHTML = renderPhasesOverview(project);
+}
+
+function renderLanding() {
+  return `<div class="landing">
+    <h1>UX Pilot</h1>
+    <p>Accompagnez vos projets UX de la découverte au handoff. Créez un projet pour commencer.</p>
+    <div class="landing-action">
+      <button data-action="new-project">Nouveau projet</button>
+    </div>
+  </div>`;
+}
+
+function renderPhasesOverview(project) {
+  const done = countDone(project);
+  const pct = Math.round((done/6)*100);
+  return `
+    <div class="proj-header">
+      <div class="proj-meta">
+        <span class="proj-title">${esc(project.name)}</span>
+        ${project.type ? `<span class="proj-type">${esc(project.type)}</span>` : ''}
+      </div>
+      <div class="proj-actions">
+        <button class="btn btn-secondary" data-action="view-synthesis" data-id="${project.id}">Vue synthèse</button>
+        <button class="btn btn-secondary" data-action="export-project" data-id="${project.id}">Exporter JSON</button>
+        <button class="btn btn-secondary" data-action="rename-project" data-id="${project.id}">Renommer</button>
+        <button class="btn-danger-outline" data-action="delete-project" data-id="${project.id}">Supprimer</button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label">${done} / 6 phases terminées</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>
+    </div>
+    <div class="phases-grid">
+      ${PHASE_ORDER.map(phId => renderPhaseCard(project, phId)).join('')}
+    </div>`;
+}
+
+function renderPhaseCard(project, phId) {
+  const conf = PHASES_CONFIG[phId];
+  const phase = project.phases[phId];
+  const [doneD, totalD] = countDeliverables(project, phId);
+  const statusLabel = STATUS_LABELS[phase.status] || 'À faire';
+  const statusClass = phase.status === 'done' ? 'done' : phase.status === 'inprogress' ? 'inprogress' : '';
+  const checkmark = phase.status === 'done' ? ' ✓' : '';
+  return `<div class="phase-card" data-action="view-phase" data-id="${project.id}" data-phase="${phId}">
+    <div class="pc-num">Phase ${conf.number}</div>
+    <div class="pc-title">${conf.label}</div>
+    <div class="pc-desc">${conf.description}</div>
+    <div class="pc-footer">
+      <span class="pc-status ${statusClass}">${statusLabel}${checkmark}</span>
+      <span class="pc-count">${doneD}/${totalD} livrables</span>
+    </div>
+  </div>`;
+}
+
+function renderPhaseView(project, phId) {
+  const conf = PHASES_CONFIG[phId];
+  const phase = project.phases[phId];
+  const delivHtml = Object.entries(conf.deliverables)
+    .map(([dId, dConf]) => renderDelivHTML(project, phId, dId, dConf, phase))
+    .join('');
+  return `
+    <div class="breadcrumb">
+      <a data-action="back-to-overview" data-id="${project.id}">${esc(project.name)}</a>
+      <span class="bc-sep">›</span>
+      <span>${conf.label}</span>
+    </div>
+    <div class="phase-head">
+      <div class="phase-head-top">
+        <div class="ph-left">
+          <div class="ph-num">Phase ${conf.number}</div>
+          <div class="ph-title">${conf.label}</div>
+        </div>
+        <select class="status-sel" data-action="change-status" data-id="${project.id}" data-phase="${phId}">
+          <option value="todo" ${phase.status==='todo'?'selected':''}>À faire</option>
+          <option value="inprogress" ${phase.status==='inprogress'?'selected':''}>En cours</option>
+          <option value="done" ${phase.status==='done'?'selected':''}>Terminé</option>
+        </select>
+      </div>
+      <div class="phase-fields">
+        <div>
+          <label class="field-label">Contexte de phase</label>
+          <textarea class="field-ta" rows="4" placeholder="Décrivez le contexte, les contraintes, les informations disponibles pour cette phase…" data-action="save-context" data-id="${project.id}" data-phase="${phId}">${esc(phase.context || '')}</textarea>
+        </div>
+        <div>
+          <label class="field-label">Notes libres</label>
+          <textarea class="field-ta" rows="4" placeholder="Vos notes, observations, questions en cours…" data-action="save-notes" data-id="${project.id}" data-phase="${phId}">${esc(phase.notes || '')}</textarea>
+        </div>
+      </div>
+    </div>
+    <div class="deliv-section">
+      <div class="deliv-header-row">Livrables</div>
+      <div id="deliverables-list-${phId}">
+        ${delivHtml}
+      </div>
+    </div>`;
+}
+
+function renderDelivHTML(project, phId, dId, dConf, phase) {
+  const loadKey = `${phId}.${dId}`;
+  const isLoading = S.loading[loadKey];
+  const deliv = phase.deliverables?.[dId];
+  const hasContent = !!(deliv && deliv.content);
+  const ts = deliv?.generatedAt ? formatDate(deliv.generatedAt) : '';
+  return `<div class="deliv" id="deliv-${phId}-${dId}">
+    <div class="deliv-top">
+      <div class="deliv-info">
+        <div class="deliv-title">${dConf.label}</div>
+        <div class="deliv-desc">${dConf.description}</div>
+      </div>
+      <div class="deliv-btns">
+        ${isLoading ? '<span style="font-size:12px;color:var(--fg-muted)">Génération…</span>' :
+          `<button class="btn btn-secondary" data-action="generate-deliverable" data-id="${project.id}" data-phase="${phId}" data-deliv="${dId}">${hasContent ? 'Regénérer' : 'Générer'}</button>`}
+      </div>
+    </div>
+    <div class="deliv-content">
+      ${isLoading ? `<div class="loading-wrap"><div class="dots"><span></span><span></span><span></span></div> <span>Génération en cours…</span></div>` : ''}
+      ${hasContent && !isLoading ? `<textarea class="deliv-output" data-action="save-deliverable" data-id="${project.id}" data-phase="${phId}" data-deliv="${dId}" rows="8">${esc(deliv.content)}</textarea>` : ''}
+      ${!hasContent && !isLoading ? `<div class="empty-deliv">Cliquez sur "Générer" pour créer ce livrable via l'IA, ou saisissez directement votre contenu ci-dessous.</div>
+      <textarea class="deliv-output" data-action="save-deliverable" data-id="${project.id}" data-phase="${phId}" data-deliv="${dId}" rows="4" placeholder="Ou saisissez votre contenu ici…"></textarea>` : ''}
+    </div>
+    ${hasContent && !isLoading ? `<div class="deliv-foot">
+      <span class="deliv-ts">${ts ? `Généré le ${ts}` : ''}</span>
+      <div class="deliv-copy-regen">
+        <button class="btn-ghost" data-action="copy-deliverable" data-phase="${phId}" data-deliv="${dId}">Copier</button>
+      </div>
+    </div>` : ''}
+  </div>`;
+}
+
+function renderDeliverable(projectId, phId, dId) {
+  const project = getProject(projectId);
+  if (!project) return;
+  const conf = PHASES_CONFIG[phId];
+  const dConf = conf.deliverables[dId];
+  const phase = project.phases[phId];
+  const el = document.getElementById(`deliv-${phId}-${dId}`);
+  if (!el) return;
+  el.outerHTML = renderDelivHTML(project, phId, dId, dConf, phase);
+}
+
+function renderSynthesis(project) {
+  const done = countDone(project);
+  const phaseSections = PHASE_ORDER.map(phId => {
+    const conf = PHASES_CONFIG[phId];
+    const phase = project.phases[phId];
+    const delivItems = Object.entries(conf.deliverables).map(([dId, dConf]) => {
+      const deliv = phase.deliverables?.[dId];
+      if (!deliv || !deliv.content) return '';
+      return `<div class="synth-deliv">
+        <div class="synth-deliv-title" data-action="nav-to-deliverable" data-id="${project.id}" data-phase="${phId}" data-deliv="${dId}">${dConf.label}</div>
+        <div class="synth-deliv-text" id="synth-text-${phId}-${dId}">${esc(deliv.content)}</div>
+        <button class="synth-expand" data-action="expand-synth" data-phase="${phId}" data-deliv="${dId}">Voir plus</button>
+      </div>`;
+    }).filter(Boolean).join('');
+    const phStatus = STATUS_LABELS[phase.status] || '';
+    return `<div class="synth-phase">
+      <div class="synth-phase-title">
+        <span class="synth-phase-num">Phase ${conf.number}</span>
+        ${conf.label}
+        <span style="font-size:11px;color:var(--fg-subtle);margin-left:auto;font-weight:400">${phStatus}</span>
+      </div>
+      ${delivItems || `<div class="synth-empty">Aucun livrable généré</div>`}
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="breadcrumb">
+      <a data-action="back-to-overview" data-id="${project.id}">${esc(project.name)}</a>
+      <span class="bc-sep">›</span>
+      <span>Synthèse</span>
+    </div>
+    <div class="synth-head">
+      <div class="synth-head-left">
+        <h2>${esc(project.name)}</h2>
+        <p>${project.type ? esc(project.type) + ' · ' : ''}${done}/6 phases terminées</p>
+      </div>
+      <div class="synth-actions">
+        <button class="btn btn-secondary" data-action="export-project" data-id="${project.id}">Exporter JSON</button>
+        <button class="btn btn-primary" data-action="print-synthesis">Imprimer / PDF</button>
+      </div>
+    </div>
+    <div class="synth-body">${phaseSections}</div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// MODALS
+// ════════════════════════════════════════════════════════════
+
+function showModal(html) {
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.remove('hidden');
+  overlay.innerHTML = `<div class="modal">${html}</div>`;
+  overlay.querySelector('.modal').addEventListener('click', e => e.stopPropagation());
+  const firstInput = overlay.querySelector('input,textarea');
+  if (firstInput) firstInput.focus();
+}
+function hideModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+}
+
+function showNewProject() {
+  showModal(`<div class="modal-title">Nouveau projet</div>
+    <div class="form-field">
+      <label class="form-label">Nom du projet</label>
+      <input class="form-input" id="new-proj-name" type="text" placeholder="Ex : Refonte espace client" autocomplete="off">
+    </div>
+    <div class="form-field">
+      <label class="form-label">Type de produit <span style="font-weight:400;text-transform:none;letter-spacing:0">(optionnel)</span></label>
+      <input class="form-input" id="new-proj-type" type="text" placeholder="Application mobile, Web SaaS, Portail intranet…">
+      <div class="form-hint">Aide l'IA à contextualiser les livrables.</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" data-action="close-modal">Annuler</button>
+      <button class="btn btn-primary" data-action="confirm-new-project">Créer le projet</button>
+    </div>`);
+  document.getElementById('new-proj-name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.querySelector('[data-action="confirm-new-project"]').click();
+  });
+}
+
+function showRename(id) {
+  const p = getProject(id);
+  if (!p) return;
+  showModal(`<div class="modal-title">Renommer le projet</div>
+    <div class="form-field">
+      <label class="form-label">Nom</label>
+      <input class="form-input" id="rename-name" type="text" value="${esc(p.name)}">
+    </div>
+    <div class="form-field">
+      <label class="form-label">Type de produit</label>
+      <input class="form-input" id="rename-type" type="text" value="${esc(p.type || '')}" placeholder="Application mobile, Web SaaS…">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" data-action="close-modal">Annuler</button>
+      <button class="btn btn-primary" data-action="confirm-rename" data-id="${id}">Enregistrer</button>
+    </div>`);
+}
+
+function showDeleteConfirm(id) {
+  const p = getProject(id);
+  if (!p) return;
+  showModal(`<div class="modal-title">Supprimer le projet ?</div>
+    <p style="font-size:14px;color:var(--fg-muted);margin-bottom:8px">Le projet <strong>${esc(p.name)}</strong> et tous ses livrables seront supprimés définitivement.</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" data-action="close-modal">Annuler</button>
+      <button class="btn-danger-outline" data-action="confirm-delete" data-id="${id}">Supprimer</button>
+    </div>`);
+}
+
+function showSettings() {
+  showModal(`<div class="modal-title">Réglages</div>
+    <div class="form-field">
+      <label class="form-label">Clé API Anthropic</label>
+      <input class="form-input" id="api-key-input" type="password" value="${esc(S.apiKey)}" placeholder="sk-ant-…" autocomplete="off">
+      <div class="form-hint">Stockée localement dans votre navigateur. Jamais envoyée à un tiers.</div>
+    </div>
+    <div class="modal-sep"></div>
+    <div style="font-size:12px;color:var(--fg-subtle)">
+      Modèle : ${MODEL}<br>
+      Données : stockées dans localStorage du navigateur
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" data-action="close-modal">Fermer</button>
+      <button class="btn btn-primary" data-action="save-api-key">Enregistrer</button>
+    </div>`);
+}
+
+// ════════════════════════════════════════════════════════════
+// IMPORT / EXPORT
+// ════════════════════════════════════════════════════════════
+
+function exportProject(id) {
+  const p = getProject(id);
+  if (!p) return;
+  const blob = new Blob([JSON.stringify(p, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `${p.name.replace(/[^a-z0-9]/gi,'-').toLowerCase()}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('Projet exporté');
+}
+
+function importProject(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.name || !data.phases) throw new Error('Format invalide');
+      data.id = uuid();
+      data.name = data.name + ' (importé)';
+      data.createdAt = new Date().toISOString();
+      data.updatedAt = new Date().toISOString();
+      // Ensure all phases exist
+      PHASE_ORDER.forEach(k => { if (!data.phases[k]) data.phases[k] = emptyPhase(); });
+      S.projects.unshift(data);
+      saveProjects();
+      S.currentId = data.id;
+      S.currentPhase = null;
+      renderAll();
+      toast('Projet importé');
+    } catch(err) {
+      toast('Erreur import : ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ════════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════════
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDate(iso) {
+  try {
+    return new Intl.DateTimeFormat('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(iso));
+  } catch { return iso; }
+}
+
+let _toastTimer;
+function toast(msg) {
+  const c = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  c.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('out');
+    setTimeout(() => el.remove(), 320);
+  }, 2500);
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => toast('Copié !')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('Copié !');
+  });
+}
+
+// Debounced save for textareas
+const _debouncers = {};
+function debouncedSaveField(key, fn, delay=600) {
+  clearTimeout(_debouncers[key]);
+  _debouncers[key] = setTimeout(fn, delay);
+}
+
+// ════════════════════════════════════════════════════════════
+// EVENTS
+// ════════════════════════════════════════════════════════════
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-action]');
+  if (!el) {
+    // Click outside modal closes it
+    if (e.target.id === 'modal-overlay') hideModal();
+    return;
+  }
+  const action = el.dataset.action;
+  const id = el.dataset.id;
+  const phase = el.dataset.phase;
+  const deliv = el.dataset.deliv;
+
+  if (action === 'select-project') {
+    S.currentId = id; S.currentPhase = null; renderAll();
+  } else if (action === 'new-project') {
+    showNewProject();
+  } else if (action === 'confirm-new-project') {
+    const name = document.getElementById('new-proj-name')?.value?.trim();
+    const type = document.getElementById('new-proj-type')?.value?.trim();
+    if (!name) { document.getElementById('new-proj-name').focus(); return; }
+    const p = createProject(name, type);
+    S.currentId = p.id; S.currentPhase = null;
+    hideModal(); renderAll();
+    toast('Projet créé');
+  } else if (action === 'rename-project') {
+    showRename(id);
+  } else if (action === 'confirm-rename') {
+    const name = document.getElementById('rename-name')?.value?.trim();
+    const type = document.getElementById('rename-type')?.value?.trim();
+    if (!name) return;
+    updateProject(id, p => { p.name = name; p.type = type || ''; });
+    hideModal(); renderAll();
+  } else if (action === 'delete-project') {
+    showDeleteConfirm(id);
+  } else if (action === 'confirm-delete') {
+    deleteProject(id);
+    if (S.currentId === id) { S.currentId = null; S.currentPhase = null; }
+    hideModal(); renderAll();
+    toast('Projet supprimé');
+  } else if (action === 'view-phase') {
+    S.currentId = id; S.currentPhase = phase; renderMain();
+  } else if (action === 'back-to-overview') {
+    S.currentId = id; S.currentPhase = null; renderMain();
+  } else if (action === 'view-synthesis') {
+    S.currentId = id; S.currentPhase = 'synthesis'; renderMain();
+  } else if (action === 'nav-to-deliverable') {
+    S.currentPhase = phase; renderMain();
+    setTimeout(() => {
+      const el2 = document.getElementById(`deliv-${phase}-${deliv}`);
+      if (el2) el2.scrollIntoView({behavior:'smooth',block:'start'});
+    }, 100);
+  } else if (action === 'generate-deliverable') {
+    generateDeliverable(id, phase, deliv);
+  } else if (action === 'copy-deliverable') {
+    const ta = document.querySelector(`textarea[data-action="save-deliverable"][data-phase="${phase}"][data-deliv="${deliv}"]`);
+    if (ta) copyText(ta.value);
+  } else if (action === 'import-project') {
+    document.getElementById('import-file')?.click();
+  } else if (action === 'export-project') {
+    exportProject(id || S.currentId);
+  } else if (action === 'open-settings') {
+    showSettings();
+  } else if (action === 'save-api-key') {
+    const k = document.getElementById('api-key-input')?.value?.trim();
+    saveApiKey(k || '');
+    hideModal();
+    toast('Clé API enregistrée');
+  } else if (action === 'close-modal') {
+    hideModal();
+  } else if (action === 'print-synthesis') {
+    window.print();
+  } else if (action === 'expand-synth') {
+    const txtEl = document.getElementById(`synth-text-${phase}-${deliv}`);
+    if (txtEl) {
+      txtEl.classList.toggle('expanded');
+      el.textContent = txtEl.classList.contains('expanded') ? 'Voir moins' : 'Voir plus';
+    }
+  }
+});
+
+// Textarea auto-save with debounce
+document.addEventListener('input', e => {
+  const el = e.target;
+  const action = el.dataset.action;
+  if (!action) return;
+  const id = el.dataset.id;
+  const phase = el.dataset.phase;
+  const deliv = el.dataset.deliv;
+
+  if (action === 'save-context') {
+    debouncedSaveField(`ctx-${id}-${phase}`, () => {
+      updateProject(id, p => { p.phases[phase].context = el.value; });
+    });
+  } else if (action === 'save-notes') {
+    debouncedSaveField(`notes-${id}-${phase}`, () => {
+      updateProject(id, p => { p.phases[phase].notes = el.value; });
+    });
+  } else if (action === 'save-deliverable') {
+    debouncedSaveField(`deliv-${id}-${phase}-${deliv}`, () => {
+      updateProject(id, p => {
+        if (!p.phases[phase].deliverables[deliv]) p.phases[phase].deliverables[deliv] = {};
+        p.phases[phase].deliverables[deliv].content = el.value;
+      });
+      renderSidebarProjects();
+    });
+  }
+});
+
+// File import + status select
+document.addEventListener('change', e => {
+  if (e.target.id === 'import-file') {
+    importProject(e.target.files[0]);
+    e.target.value = '';
+  } else if (e.target.dataset.action === 'change-status') {
+    const sel = e.target;
+    updateProject(sel.dataset.id, p => { p.phases[sel.dataset.phase].status = sel.value; });
+    renderSidebarProjects();
+  }
+});
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+
+function init() {
+  load();
+  renderSidebar();
+  if (S.projects.length > 0) {
+    S.currentId = S.projects[0].id;
+  }
+  renderMain();
+  if (!S.apiKey) {
+    setTimeout(() => {
+      showModal(`<div class="modal-title">Bienvenue sur UX Pilot</div>
+        <p style="font-size:13px;color:var(--fg-muted);margin-bottom:16px">Pour générer des livrables via l'IA, renseignez votre clé API Anthropic. Elle sera stockée uniquement dans votre navigateur.</p>
+        <div class="form-field">
+          <label class="form-label">Clé API Anthropic</label>
+          <input class="form-input" id="api-key-input" type="password" placeholder="sk-ant-…" autocomplete="off">
+          <div class="form-hint">Obtenez votre clé sur console.anthropic.com</div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" data-action="close-modal">Plus tard</button>
+          <button class="btn btn-primary" data-action="save-api-key">Enregistrer</button>
+        </div>`);
+    }, 400);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
