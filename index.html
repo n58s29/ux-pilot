@@ -2086,116 +2086,139 @@ function exportMockupSpec(id) {
   const p = getProject(id);
   if (!p) return;
 
-  const phaseColors = {
-    discovery:'#0088cc', research:'#00b388', ideation:'#8374d1',
-    design:'#eed484', testing:'#dc582a', handoff:'#651c32'
+  // Récupère le contenu d'un livrable généré
+  const getDeliv = (phId, dId) => {
+    const d = ((p.phases[phId] || {}).deliverables || {})[dId] || {};
+    return d.content || null;
   };
 
-  const phasesSpec = PHASE_ORDER.map(phId => {
+  // Compile tous les livrables générés par phase
+  const livrables_generes = {};
+  PHASE_ORDER.forEach(phId => {
     const conf = PHASES_CONFIG[phId];
     const phase = p.phases[phId] || {};
-    const livrables = Object.entries(conf.deliverables).map(([dId, dConf]) => {
-      const deliv = (phase.deliverables || {})[dId] || {};
-      return {
-        id: dId,
-        titre: dConf.label,
-        description: dConf.description,
-        statut: deliv.content ? 'genere' : 'vide',
-        contenu: deliv.content || null,
-        genere_le: deliv.generatedAt || null
-      };
+    Object.entries(conf.deliverables).forEach(([dId, dConf]) => {
+      const content = getDeliv(phId, dId);
+      if (content) {
+        if (!livrables_generes[phId]) livrables_generes[phId] = { label: conf.label, livrables: {} };
+        livrables_generes[phId].livrables[dId] = { titre: dConf.label, contenu: content };
+      }
     });
-    const generes = livrables.filter(l => l.statut === 'genere').length;
-    return {
-      numero: conf.number,
-      id: phId,
-      label: conf.label,
-      description: conf.description,
-      couleur_accent: phaseColors[phId],
-      statut: phase.status || 'todo',
-      contexte: phase.context || '',
-      notes: phase.notes || '',
-      progression: `${generes}/${livrables.length} livrables générés`,
-      livrables
-    };
   });
 
   const spec = {
-    meta: {
-      nom: `Spec maquette — ${p.name}`,
-      description: "Expression de besoin pour produire une maquette HTML/JS/CSS vanilla semi-fonctionnelle. Ce fichier a été généré par ZENITH (outil de gestion de projets UX de la FAN), mais la maquette à produire est celle du PROJET décrit dans ce fichier, pas celle de ZENITH.",
-      version: "1.0.0",
-      projet_source: { id: p.id, nom: p.name, type: p.type || null, cree_le: p.createdAt },
-      genere_le: new Date().toISOString(),
-      organisation: "Fabrique de l'Adoption Numérique (FAN) — SNCF",
-      stack_cible: "HTML5 + CSS3 + JS vanilla — fichier unique, aucune dépendance",
-      objectif: "Prototype semi-fonctionnel avec navigation entre écrans, modals fonctionnelles et données réelles du projet",
-      instructions_llm: {
-        important: "Tu produis la maquette du PROJET ci-dessous, pas de l'outil ZENITH qui a généré ce fichier.",
-        naming: "Trouve un nom d'application en français, court (1 ou 2 mots max), mémorable et en lien direct avec le projet. Évite les anglicismes. Propose-le en début de réponse avant de générer le code.",
-        exemples_bons_noms: ["Baromètre → 'Repère'", "Application de gestion → 'Pilote'", "Outil de suivi → 'Vigie'", "Tableau de bord → 'Boussole'"],
-        ton: "Interface professionnelle, sobre, en français intégral (labels, placeholders, messages d'erreur, toasts)."
-      }
+
+    "A_LIRE_EN_PREMIER": {
+      "⚠️ CE QUE TU DOIS PRODUIRE": `Une maquette HTML/JS/CSS vanilla du produit "${p.name}"${p.type ? ` (${p.type})` : ''}. Ce fichier vient de ZENITH, un outil de gestion de projets UX — ZENITH n'est PAS le produit à maquetter.`,
+      "🚫 NE PAS FAIRE": [
+        "Ne pas créer une interface de gestion de projets UX",
+        "Ne pas créer de sidebar 'liste de projets', de grille de phases, de vue livrables",
+        "Ne pas nommer le produit 'ZENITH' ni reproduire son UI",
+        "Ne pas inventer des fonctionnalités absentes des livrables UX ci-dessous"
+      ],
+      "✅ À FAIRE": [
+        `Analyser 'ux_reference' pour comprendre le produit "${p.name}" et ses utilisateurs`,
+        "Proposer un nom français court et mémorable AVANT de coder (voir 'naming')",
+        `Déduire les écrans nécessaires depuis le sitemap et les user flows${getDeliv('ideation','sitemap') ? ' (tous deux présents dans ux_reference)' : ''}`,
+        "Créer des données mock réalistes tirées des personas et du contexte SNCF",
+        "Appliquer la charte graphique FAN (section 'charte_fan')"
+      ]
     },
 
-    design_system: {
-      typographie: { famille: "Avenir Next, Arial, sans-serif", poids: { light:300, regular:400, medium:500 } },
+    naming: {
+      consigne: "Trouve un nom en français, 1-2 mots max, mémorable, en lien avec le projet. Propose-le en tout début de réponse avant le code.",
+      registres_suggeres: ["Repère", "Boussole", "Vigie", "Sillage", "Horizon", "Pilote", "Jauge", "Cap"],
+      a_eviter: ["ZENITH", "tout anglicisme", "acronymes opaques"]
+    },
+
+    produit: {
+      nom: p.name,
+      type: p.type || null,
+      contexte_metier: (p.phases.discovery || {}).context || null,
+      organisation: "SNCF — Fabrique de l'Adoption Numérique",
+      public_cible: "Extrait des personas dans ux_reference.research.personas — utiliser ces profils pour les données mock et les écrans"
+    },
+
+    charte_fan: {
+      "_note": "Design system FAN à appliquer au produit maquetté. Variables CSS à déclarer dans :root.",
+      typographie: "Avenir Next, Arial, sans-serif — Light 300 / Regular 400 / Medium 500 (jamais > 500)",
       couleurs: {
-        structurelles: { "--primaire":"#001b44","--primaire-conteneur":"#123062","--sur-primaire":"#ffffff","--sur-primaire-conteneur":"#d1e0f0" },
-        surfaces: { "--surface":"#f7f9ff","--surface-basse":"#f1f4fa","--surface-haute":"#dfe3e8","--surface-flottante":"#ffffff" },
-        texte: { "--sur-surface":"#181c20","--sur-surface-secondaire":"#44474e" },
-        fonctionnelles: { "--cerulean":"#0088cc","--menthe":"#00b388","--lavande":"#8374d1","--ambre":"#eed484","--ocre":"#dc582a","--bourgogne":"#651c32" }
+        "--primaire": "#001b44",
+        "--primaire-conteneur": "#123062",
+        "--sur-primaire": "#ffffff",
+        "--sur-primaire-conteneur": "#d1e0f0",
+        "--surface": "#f7f9ff",
+        "--surface-basse": "#f1f4fa",
+        "--surface-haute": "#dfe3e8",
+        "--surface-flottante": "#ffffff",
+        "--sur-surface": "#181c20",
+        "--sur-surface-secondaire": "#44474e",
+        "--cerulean": "#0088cc",
+        "--menthe": "#00b388",
+        "--lavande": "#8374d1",
+        "--ambre": "#eed484",
+        "--ocre": "#dc582a",
+        "--bourgogne": "#651c32"
       },
+      principes_visuels: [
+        "Séparation par empilement tonal (surface / surface-basse / surface-flottante), pas de border: 1px solid partout",
+        "Formulaires : fond --surface-haute, border-bottom 2px au focus uniquement",
+        "Boutons : primaire navy | secondaire surface-haute | ghost transparent | danger ocre",
+        "Radius : 4-6px (micro), jamais de grands arrondis",
+        "Ombres douces : 0 4px 20px rgba(0,27,68,.10)"
+      ],
       animations: {
-        keyframes: ["fadein : opacity 0→1 (150ms ease-out)","slideup : opacity+translateY(6px)→0 (150ms ease-out)","fadeout : opacity 1→0 (300ms ease-in)","pulse : 2s infini (point vivant)","dot-loading : 3 points décalés 0/0.2/0.4s"],
-        durees: { rapide:"100ms", normale:"150ms", lente:"300ms" }
-      },
-      couleurs_par_phase: PHASE_ORDER.map(phId => ({ phase: PHASES_CONFIG[phId].number, id: phId, label: PHASES_CONFIG[phId].label, hex: phaseColors[phId] }))
-    },
-
-    donnees_mock: {
-      description: "Données réelles du projet — à injecter dans la maquette telles quelles.",
-      projet: {
-        id: p.id, nom: p.name, type: p.type || null,
-        phases_terminees: PHASE_ORDER.filter(ph => (p.phases[ph]||{}).status === 'done').length,
-        statuts: PHASE_ORDER.reduce((acc, ph) => { acc[ph] = (p.phases[ph]||{}).status || 'todo'; return acc; }, {})
+        fadein: "opacity 0→1, 150ms ease-out",
+        slideup: "opacity 0 + translateY(8px) → 1 + translateY(0), 150ms ease-out",
+        toast: "slideup 150ms entrée / fadeout 300ms sortie, auto-dismiss 2500ms"
       }
     },
 
-    phases: phasesSpec,
+    ux_reference: livrables_generes,
 
-    ecrans: [
-      { id:"landing", nom:"Landing — aucun projet", description:"État initial, aucun projet sélectionné", composants:["point_vivant animé (pulse 2s)","titre ZENITH 21px","texte descriptif","bouton CTA 'Nouveau projet'"] },
-      { id:"phases_overview", nom:"Vue d'ensemble — 6 phases", description:"Grille 3 colonnes des phases avec progression", composants:["en-tête projet (nom + type + barre progression)","boutons : Vue synthèse / Exporter JSON / Spec maquette / Renommer / Supprimer","6 cartes phase (bordure top colorée, statut, compteur livrables)"] },
-      { id:"phase_detail", nom:"Détail d'une phase", description:"Vue profonde : fil d'Ariane + métadonnées + liste livrables", composants:["breadcrumb cliquable","sélecteur statut","textareas contexte + notes (debounce 600ms)","cartes livrables (bouton Générer → loading → contenu + Copier)"] },
-      { id:"synthesis", nom:"Vue synthèse", description:"Dashboard lecture seule de tous les livrables générés", composants:["en-tête (compteur phases terminées)","sections par phase avec previews expandables (max-height 220px)","navigation vers phase_detail au clic sur titre livrable"] }
-    ],
-
-    modales: [
-      { id:"modal-welcome", declencheur:"Premier lancement sans clé API", champs:["input password clé API"] },
-      { id:"modal-new-project", declencheur:"Bouton 'Nouveau projet'", champs:["input text nom (requis)","input text type (optionnel)"] },
-      { id:"modal-rename", declencheur:"Bouton 'Renommer'", champs:["input text nom (pré-rempli)","input text type (pré-rempli)"] },
-      { id:"modal-delete", declencheur:"Bouton 'Supprimer'", confirmation:`Supprime "${p.name}" définitivement` },
-      { id:"modal-settings", declencheur:"Bouton Réglages API", champs:["input password clé API","infos : modèle claude-sonnet-4-20250514 + localStorage"] }
-    ],
-
-    composants_cles: {
-      sidebar: { largeur:"240px", sections:["header navy (logo ZENITH + tagline)","search bar (filtre temps réel)","liste projets (actif = bordure gauche cerulean)","footer : Nouveau projet + Importer + Réglages + signature FAN"] },
-      toast: { position:"fixed bottom-right 24px", duree_affichage:"2500ms", animation:"slideup 150ms / fadeout 300ms" },
-      loading_indicator: { structure:"3 points animés + texte 'Génération en cours…'", couleur:"--cerulean" },
-      progress_bar: { hauteur:"3px", gradient:"cerulean → menthe", transition:"width 300ms ease-out" }
+    guide_ecrans: {
+      "_note": `Dériver les écrans depuis ux_reference.ideation.sitemap et ux_reference.ideation.user_flows${!getDeliv('ideation','sitemap') ? ' (non encore générés — déduire du contexte et du type ' + (p.type||'') + ')' : ''}.`,
+      pattern_spa: "SPA fichier unique : état global S = {}, fonctions render() injectant du HTML dans #main, event delegation sur document",
+      interactions_minimum: [
+        "Navigation entre écrans (routeur JS simple)",
+        "Au moins 1 modal fonctionnelle (ex : filtre, détail, confirmation)",
+        "Filtres ou recherche temps réel sur les données",
+        "États vide / chargement (setTimeout 1200ms) / rempli",
+        "Toasts de confirmation (slideup + auto-dismiss)",
+        "Responsive : breakpoint 900px"
+      ],
+      composants_utiles: {
+        kpi_card: "Carte métrique avec valeur, label, évolution, couleur de statut",
+        data_table: "Tableau trié/filtrable avec pagination",
+        progress_gauge: "Jauge circulaire ou barre de progression avec seuils colorés",
+        persona_switcher: "Onglets pour naviguer entre profils utilisateurs",
+        benchmark_chart: "Graphique comparatif horizontal (barres ou radar)",
+        toast: "Notification bottom-right, fond --primaire, 2500ms",
+        modal: "Overlay navy translucide + conteneur surface-flottante, animation slideup"
+      }
     },
 
-    interactions_mockup: [
-      { id:"generation_simulee", description:"Simuler la génération IA sans appel API", etapes:["Clic 'Générer' → afficher loading","setTimeout 1500ms","Injecter le contenu du livrable (depuis phases[].livrables[].contenu)","Afficher footer timestamp + bouton Copier"] },
-      { id:"navigation", description:"SPA : injecter du HTML dans #main selon l'écran actif", etapes:["État global S = { currentScreen, currentProjectId, currentPhase }","Fonctions render() qui retournent du HTML string","Un seul event listener document (event delegation)"] },
-      { id:"export_json", description:"Télécharger les données du projet", etapes:["JSON.stringify(projet)","Blob application/json","Lien temporaire + click()"] }
-    ],
-
-    instructions: {
+    instructions_techniques: {
       fichier_unique: true,
-      ordre_implementation: ["1. Variables CSS (tokens complets ci-dessus)","2. Layout app (sidebar 240px + main flex)","3. Sidebar statique avec données mock","4. Écran landing","5. Modale générique + modale new-project","6. Données mock (objet JS avec projet et phases)","7. Routeur JS simple (état global S)","8. phases_overview (grille 6 cartes)","9. phase_detail (livrables avec génération simulée)","10. Synthesis view","11. Toutes les modales restantes","12. Toast système","13. Responsive @media 900px","14. Print styles"],
-      bonnes_pratiques: ["Toutes les couleurs via variables CSS --token","Event delegation sur document (1 seul listener)","État dans un objet global S = {}","Render functions = string HTML injecté via innerHTML","setTimeout pour simuler les délais IA (1200–1800ms)","Pas de framework, pas d'import/export"]
+      stack: "HTML5 + CSS3 + JS vanilla — aucune dépendance npm, aucun CDN",
+      donnees: "Données mock statiques dans un objet JS — tirées des personas et du contexte projet",
+      ordre_implementation: [
+        "1. Variables CSS (charte_fan.couleurs + typographie)",
+        "2. Reset + base typographique",
+        "3. Layout principal (header ou sidebar selon le type de produit)",
+        "4. Données mock (objet JS réaliste basé sur les personas)",
+        "5. Routeur JS simple (objet S + fonction render())",
+        "6. Écrans principaux (dérivés du sitemap / user flows)",
+        "7. Modales",
+        "8. Toast système",
+        "9. Responsive @media 900px"
+      ],
+      bonnes_pratiques: [
+        "Toutes les couleurs via variables CSS --token",
+        "1 seul event listener : document.addEventListener('click', e => { const t = e.target.closest('[data-action]') })",
+        "Render functions = string HTML injecté via innerHTML",
+        "Pas de framework, pas d'import/export, tout en scope global"
+      ]
     }
   };
 
