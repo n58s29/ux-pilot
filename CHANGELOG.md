@@ -4,6 +4,21 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2.2.0] — 2026-04-16
+
+### Added
+- **Spécification maquette JSON** (`zenith-mockup-spec.json`) — expression de besoin complète pour produire une maquette HTML/JS/CSS vanilla semi-fonctionnelle
+  - Design system complet : tokens couleurs, typographie, espacements, animations, ombres
+  - 29 livrables UX avec contenu mock réaliste (données SNCF contextualisées)
+  - 4 écrans spécifiés composant par composant (landing, phases overview, phase detail, synthesis)
+  - 5 modales documentées (welcome, new project, rename, delete, settings)
+  - Bibliothèque de composants : sidebar, boutons, form controls, toast, loading indicator
+  - Graphe de navigation complet (15 transitions entre écrans et modales)
+  - 6 interactions clés détaillées (génération mockée, export JSON, clipboard, filtrage sidebar…)
+  - Instructions d'implémentation ordonnées + bonnes pratiques vanilla JS
+
+---
+
 ## [2.1.0] — 2026-04-16
 
 ### Added

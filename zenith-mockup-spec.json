@@ -1,0 +1,1069 @@
+{
+  "meta": {
+    "name": "ZENITH — Spécification maquette semi-fonctionnelle",
+    "description": "Expression de besoin complète pour produire une maquette HTML/JS/CSS vanilla de l'application ZENITH. Contient tous les éléments de design system, écrans, composants, interactions et données nécessaires.",
+    "version": "1.0.0",
+    "organisation": "Fabrique de l'Adoption Numérique (FAN) — SNCF",
+    "stack_cible": "HTML5 + CSS3 + JS vanilla (aucun framework, aucune dépendance npm)",
+    "objectif_maquette": "Prototype semi-fonctionnel : navigation entre écrans, modals fonctionnelles, états UI interactifs, données mockées statiques (pas d'appels API réels)"
+  },
+
+  "design_system": {
+    "typographie": {
+      "famille": "Avenir Next, Arial, sans-serif",
+      "poids": {
+        "light": 300,
+        "regular": 400,
+        "medium": 500
+      },
+      "echelles": [
+        { "usage": "Titre principal (h1)", "taille": "21px", "poids": 500, "espacement": "-0.02em" },
+        { "usage": "Titre section (h2/h3)", "taille": "19px", "poids": 500, "espacement": "-0.02em" },
+        { "usage": "Corps de texte", "taille": "14px", "poids": 300, "hauteur_ligne": 1.65 },
+        { "usage": "Labels UI (uppercase)", "taille": "11px", "poids": 400, "espacement": "0.08em", "transformation": "uppercase" },
+        { "usage": "Inputs / formulaires", "taille": "13px", "poids": 300 },
+        { "usage": "Légendes / métadonnées", "taille": "11px", "poids": 300 }
+      ]
+    },
+
+    "couleurs": {
+      "structurelles": {
+        "--primaire": "#001b44",
+        "--primaire-conteneur": "#123062",
+        "--sur-primaire": "#ffffff",
+        "--sur-primaire-conteneur": "#d1e0f0"
+      },
+      "surfaces": {
+        "--surface": "#f7f9ff",
+        "--surface-basse": "#f1f4fa",
+        "--surface-haute": "#dfe3e8",
+        "--surface-flottante": "#ffffff"
+      },
+      "texte": {
+        "--sur-surface": "#181c20",
+        "--sur-surface-secondaire": "#44474e"
+      },
+      "fonctionnelles": {
+        "--cerulean": "#0088cc",
+        "--menthe": "#00b388",
+        "--lavande": "#8374d1",
+        "--ambre": "#eed484",
+        "--ocre": "#dc582a",
+        "--bourgogne": "#651c32"
+      },
+      "utilitaires": {
+        "--succes-fond": "#d3e9e5",
+        "--ombre-ambiante": "rgba(0, 26, 66, 0.06)",
+        "--bordure-fantome": "rgba(116, 119, 128, 0.15)"
+      }
+    },
+
+    "espacements": {
+      "unite_base": "8px",
+      "echelles": [4, 8, 12, 16, 20, 24, 28, 32, 40, 48]
+    },
+
+    "rayons": {
+      "micro": "4px",
+      "standard": "6px",
+      "cercle": "50%"
+    },
+
+    "ombres": {
+      "ambiante": "0 12px 40px rgba(0, 26, 66, 0.06)",
+      "modale": "0 24px 60px rgba(0, 26, 66, 0.18)",
+      "toast": "0 8px 24px rgba(0, 26, 66, 0.06)"
+    },
+
+    "animations": {
+      "durees": {
+        "rapide": "100ms",
+        "normale": "150ms",
+        "lente": "300ms"
+      },
+      "easings": {
+        "entree": "cubic-bezier(0, 0, 0.2, 1)",
+        "sortie": "cubic-bezier(0.4, 0, 1, 1)",
+        "bidirectionnel": "cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      "keyframes": [
+        {
+          "nom": "fadein",
+          "definition": "opacity: 0 → 1",
+          "duree": "150ms ease-out"
+        },
+        {
+          "nom": "slideup",
+          "definition": "opacity: 0 + translateY(6px) → opacity: 1 + translateY(0)",
+          "duree": "150ms ease-out"
+        },
+        {
+          "nom": "fadeout",
+          "definition": "opacity: 1 + translateY(0) → opacity: 0 + translateY(3px)",
+          "duree": "300ms ease-out"
+        },
+        {
+          "nom": "pulse",
+          "definition": "opacity: 1 → 0.4 → 1",
+          "duree": "2s infinite"
+        },
+        {
+          "nom": "dot-loading",
+          "definition": "scale + opacity oscillant, délais décalés (0s, 0.2s, 0.4s)",
+          "duree": "1s infinite"
+        }
+      ]
+    },
+
+    "couleurs_par_phase": [
+      { "phase": 1, "id": "discovery", "couleur": "--cerulean", "hex": "#0088cc" },
+      { "phase": 2, "id": "research", "couleur": "--menthe", "hex": "#00b388" },
+      { "phase": 3, "id": "ideation", "couleur": "--lavande", "hex": "#8374d1" },
+      { "phase": 4, "id": "design", "couleur": "--ambre", "hex": "#eed484" },
+      { "phase": 5, "id": "testing", "couleur": "--ocre", "hex": "#dc582a" },
+      { "phase": 6, "id": "handoff", "couleur": "--bourgogne", "hex": "#651c32" }
+    ]
+  },
+
+  "donnees_mock": {
+    "description": "Données statiques à injecter dans la maquette pour simuler un état réel. Aucun appel API nécessaire.",
+    "projet_exemple": {
+      "id": "proj-demo-001",
+      "name": "Application Voyageur SNCF",
+      "type": "Application mobile",
+      "createdAt": "2026-04-01T09:00:00Z",
+      "phases": {
+        "discovery": {
+          "status": "done",
+          "context": "Refonte de l'application pour les voyageurs fréquents. Focus sur la gestion des perturbations en temps réel.",
+          "notes": "Entretiens avec 12 voyageurs identifiés. Enjeu fort sur l'accessibilité PMR.",
+          "livrables_generes": ["problem_statement", "research_plan", "stakeholder_map"]
+        },
+        "research": {
+          "status": "inprogress",
+          "context": "Phase d'entretiens en cours. 8 entretiens réalisés sur 15 planifiés.",
+          "notes": "Thème récurrent : frustration face au manque d'information proactive.",
+          "livrables_generes": ["guide_entretien", "personas"]
+        },
+        "ideation": { "status": "todo", "context": "", "notes": "", "livrables_generes": [] },
+        "design": { "status": "todo", "context": "", "notes": "", "livrables_generes": [] },
+        "testing": { "status": "todo", "context": "", "notes": "", "livrables_generes": [] },
+        "handoff": { "status": "todo", "context": "", "notes": "", "livrables_generes": [] }
+      }
+    },
+    "projets_sidebar": [
+      { "id": "proj-demo-001", "name": "Application Voyageur SNCF", "type": "Application mobile", "phases_terminees": 1 },
+      { "id": "proj-demo-002", "name": "Portail Agent Fret", "type": "Web SaaS", "phases_terminees": 3 },
+      { "id": "proj-demo-003", "name": "Borne Self-Check", "type": "Kiosque tactile", "phases_terminees": 0 }
+    ],
+    "statuts": {
+      "todo": { "label": "À faire", "couleur": "--sur-surface-secondaire" },
+      "inprogress": { "label": "En cours", "couleur": "--cerulean" },
+      "done": { "label": "Terminé", "icone": "✓", "couleur": "--menthe" }
+    }
+  },
+
+  "phases": [
+    {
+      "numero": 1,
+      "id": "discovery",
+      "label": "Discovery & Cadrage",
+      "description": "Structuration du problème et définition du périmètre",
+      "couleur_accent": "#0088cc",
+      "livrables": [
+        {
+          "id": "problem_statement",
+          "titre": "Problem Statement",
+          "description": "Qui / Quoi / Pourquoi / Impact",
+          "contenu_mock": "**Qui** : Voyageurs fréquents (abonnés TGV Inoui), 25–55 ans, déplacements pro.\n\n**Quoi** : Ils ne disposent pas d'informations proactives en cas de perturbation et doivent chercher eux-mêmes les alternatives.\n\n**Pourquoi** : L'application actuelle affiche les alertes avec 15–30 min de retard vs les annonces quai.\n\n**Impact** : Stress élevé, perte de confiance dans SNCF, recours aux SMS/Twitter pour s'informer."
+        },
+        {
+          "id": "research_plan",
+          "titre": "Research Plan",
+          "description": "Méthodes, profils à recruter, timeline",
+          "contenu_mock": "**Objectifs** : Comprendre les comportements d'adaptation face aux perturbations.\n\n**Méthodes** : Entretiens semi-directifs (n=15) + journal de bord (n=5, 2 semaines).\n\n**Profils** : 5 abonnés fréquents / 5 occasionnels / 5 voyageurs PMR.\n\n**Timeline** : Recrutement S1, entretiens S2–S3, synthèse S4."
+        },
+        {
+          "id": "stakeholder_map",
+          "titre": "Stakeholder Map",
+          "description": "Parties prenantes, niveau d'influence, attentes",
+          "contenu_mock": "| Partie prenante | Influence | Intérêt | Attente principale |\n|---|---|---|---|\n| Direction Digitale | Haute | Haute | ROI mesurable |\n| Équipe Exploitation | Haute | Moyenne | Intégration SI existant |\n| Service Client | Moyenne | Haute | Réduction appels entrants |\n| Voyageurs PMR | Faible | Haute | Accessibilité garantie |"
+        },
+        {
+          "id": "jtbd_canvas",
+          "titre": "JTBD Canvas",
+          "description": "3 à 5 jobs-to-be-done avec contexte, motivation, résultat attendu",
+          "contenu_mock": "**Job 1** : Être informé immédiatement d'une perturbation sur mon trajet.\n- Contexte : Sur le quai ou dans le train\n- Motivation : Ne pas rater une correspondance\n- Résultat : Je prends la bonne décision sans stress"
+        }
+      ]
+    },
+    {
+      "numero": 2,
+      "id": "research",
+      "label": "Research Utilisateur",
+      "description": "Collecte et analyse des données utilisateurs",
+      "couleur_accent": "#00b388",
+      "livrables": [
+        {
+          "id": "guide_entretien",
+          "titre": "Guide d'entretien",
+          "description": "Questions ouvertes structurées par thème",
+          "contenu_mock": "**Introduction** (5 min)\n- Présentation, objectifs, enregistrement\n\n**Thème 1 — Habitudes de voyage** (10 min)\n- Décrivez votre dernier trajet en train. Que s'est-il passé ?\n- Comment vous informez-vous avant de partir ?\n\n**Thème 2 — Gestion des imprévus** (20 min)\n- Racontez une situation de perturbation. Comment avez-vous réagi ?\n- Qu'est-ce qui vous a le plus manqué à ce moment-là ?"
+        },
+        {
+          "id": "synthesis_template",
+          "titre": "Synthesis Template",
+          "description": "Grille d'analyse des entretiens",
+          "contenu_mock": "| Participant | Comportement observé | Citation clé | Frustration principale | Opportunité |\n|---|---|---|---|---|\n| P01 — Marie, 42 ans | Consulte Twitter en priorité | \"L'appli est toujours en retard\" | Délai d'information | Push temps réel |"
+        },
+        {
+          "id": "personas",
+          "titre": "Personas",
+          "description": "2 à 3 personas complets avec citations, objectifs, frustrations",
+          "contenu_mock": "**Persona 1 — Sophie, 38 ans, Consultante**\n- Trajet Paris-Lyon 3×/semaine\n- Objectif : Arriver à l'heure à ses réunions\n- Frustration : \"Je ne sais jamais si mon train est fiable\"\n- Comportement : Vérifie l'appli toutes les 10 min avant le départ\n\n**Persona 2 — Marc, 62 ans, Retraité PMR**\n- Voyages mensuels pour voir sa famille\n- Objectif : Voyager sereinement avec son fauteuil roulant\n- Frustration : \"Les infos accessibilité changent sans prévenir\""
+        },
+        {
+          "id": "journey_map",
+          "titre": "Journey Map",
+          "description": "Phases / actions / pensées / émotions / opportunités",
+          "contenu_mock": "| Phase | Action | Pensée | Émotion | Opportunité |\n|---|---|---|---|---|\n| Avant | Consulte horaires | Est-ce que ça va partir à l'heure ? | Anxiété légère | Indicateur de fiabilité |\n| Départ | Arrive en gare | Où est affiché mon quai ? | Confusion | Affichage proactif |\n| Perturbation | Cherche info | Qu'est-ce qui se passe ? | Stress fort | Notification push immédiate |\n| Résolution | Prend alternative | Est-ce que j'arriverai à temps ? | Incertitude | Simulation d'itinéraire |"
+        },
+        {
+          "id": "insight_cards",
+          "titre": "Insight Cards",
+          "description": "5 à 8 insights clés avec implication design",
+          "contenu_mock": "**Insight 1** : Les voyageurs font plus confiance aux annonces sonores qu'à l'application.\n→ Implication : Aligner les données push avec les annonces quai en temps réel.\n\n**Insight 2** : En cas de perturbation, 70% des participants contactent un proche avant d'agir.\n→ Implication : Intégrer le partage de situation en un tap.\n\n**Insight 3** : Les PMR ont besoin d'infos accessibilité 30 min avant, pas 5 min avant.\n→ Implication : Alertes accessibilité anticipées paramétrables."
+        }
+      ]
+    },
+    {
+      "numero": 3,
+      "id": "ideation",
+      "label": "Idéation & Architecture",
+      "description": "Exploration des solutions et structure de l'information",
+      "couleur_accent": "#8374d1",
+      "livrables": [
+        {
+          "id": "sitemap",
+          "titre": "Sitemap",
+          "description": "Arborescence textuelle en markdown indenté",
+          "contenu_mock": "- Accueil\n  - Mes trajets\n    - Trajet en cours\n    - Prochains trajets\n  - Alertes & perturbations\n    - Notification push\n    - Alternatives proposées\n  - Mon profil\n    - Préférences de voyage\n    - Alertes configurées\n  - Accessibilité\n    - Mes besoins PMR\n    - État des équipements"
+        },
+        {
+          "id": "user_flows",
+          "titre": "User Flows",
+          "description": "2 à 3 flux principaux avec étapes et bifurcations",
+          "contenu_mock": "**Flux 1 — Gestion d'une perturbation**\n1. Notification push reçue\n2. Tap → Détail de la perturbation\n3. [Bifurcation] Train annulé → Alternatives proposées / Train retardé → Nouveau temps estimé\n4. Choix d'une alternative → Confirmation\n5. Nouveau billet envoyé par email\n\n**Flux 2 — Configuration alertes PMR**\n1. Profil → Section accessibilité\n2. Activation des alertes PMR\n3. Paramétrage du délai (15/30/60 min)\n4. Test de notification\n5. Confirmation de configuration"
+        },
+        {
+          "id": "design_principles",
+          "titre": "Design Principles",
+          "description": "4 à 6 principes directeurs du produit",
+          "contenu_mock": "1. **Proactif plutôt que réactif** — L'application anticipe les besoins sans attendre que l'utilisateur demande.\n2. **Confiance par la transparence** — Chaque information affichée indique sa source et son heure de mise à jour.\n3. **Simple dans le stress** — En situation de perturbation, l'interface se simplifie pour aller à l'essentiel.\n4. **Inclusif par défaut** — L'accessibilité n'est pas une option, elle est intégrée dès la conception."
+        },
+        {
+          "id": "how_might_we",
+          "titre": "How Might We",
+          "description": "8 à 10 questions HMW issues des insights",
+          "contenu_mock": "1. HMW rendre les alertes de perturbation plus rapides que les annonces quai ?\n2. HMW permettre au voyageur de partager sa situation en une seconde ?\n3. HMW anticiper les besoins PMR avant qu'ils ne deviennent urgents ?\n4. HMW réduire l'anxiété avant le départ sans surcharger d'informations ?\n5. HMW afficher les alternatives de manière à faciliter la décision rapide ?"
+        },
+        {
+          "id": "concept_brief",
+          "titre": "Concept Brief",
+          "description": "Description synthétique du concept de solution",
+          "contenu_mock": "**Concept : « Voyage Serein »**\n\nUne surcouche intelligente à l'application existante qui monitore en continu les trajets enregistrés et notifie proactivement le voyageur avec le bon niveau d'information au bon moment.\n\n**Différenciateur** : La solution s'adapte au profil (PMR, pro, loisir) et au niveau de stress détecté (calme = résumé / perturbation = mode urgence simplifié)."
+        }
+      ]
+    },
+    {
+      "numero": 4,
+      "id": "design",
+      "label": "Design UI & Prototypage",
+      "description": "Conception des interfaces et préparation du handoff",
+      "couleur_accent": "#eed484",
+      "livrables": [
+        {
+          "id": "content_inventory",
+          "titre": "Content Inventory",
+          "description": "Contenus par écran/section avec type et priorité",
+          "contenu_mock": "| Écran | Section | Type de contenu | Priorité | Source |\n|---|---|---|---|---|\n| Accueil | Prochain trajet | Données dynamiques | P0 | API SNCF |\n| Accueil | Alerte active | Composant conditionnel | P0 | Push notification |\n| Détail perturbation | Message d'explication | Texte structuré | P1 | Rédaction UX |\n| Alternatives | Liste de trains | Données dynamiques | P0 | API SNCF |"
+        },
+        {
+          "id": "annotation_template",
+          "titre": "Annotation Template",
+          "description": "Structure d'annotation des maquettes pour les développeurs",
+          "contenu_mock": "**Structure d'annotation standardisée :**\n\n[N°] Composant — Comportement attendu\n- État par défaut : ...\n- État hover/focus : ...\n- État actif : ...\n- État d'erreur : ...\n- Accessibilité : role, aria-label, tabIndex\n- Responsive : comportement < 768px"
+        },
+        {
+          "id": "accessibility_checklist",
+          "titre": "Accessibility Checklist",
+          "description": "Checklist WCAG 2.2 adaptée au produit",
+          "contenu_mock": "**Perception**\n- [ ] Contraste texte ≥ 4.5:1 (normal), ≥ 3:1 (grand texte)\n- [ ] Alternatives textuelles pour toutes les icônes fonctionnelles\n- [ ] Pas d'information transmise par la couleur seule\n\n**Opérabilité**\n- [ ] Navigation clavier complète sans piège\n- [ ] Focus visible sur tous les éléments interactifs\n- [ ] Zone de clic ≥ 44×44px\n\n**Compréhension**\n- [ ] Labels explicites sur tous les champs\n- [ ] Messages d'erreur descriptifs et localisés"
+        },
+        {
+          "id": "motion_guidelines",
+          "titre": "Motion Guidelines",
+          "description": "Durées, easings et intentions par interaction",
+          "contenu_mock": "| Interaction | Durée | Easing | Intention |\n|---|---|---|---|\n| Apparition modale | 150ms | ease-out | Surgir du bas = urgence |\n| Transition d'écran | 200ms | ease-in-out | Continuité spatiale |\n| Notification push | 300ms | ease-out | Attirer l'attention sans agresser |\n| Micro-feedback bouton | 100ms | ease-out | Confirmer l'action |\n| Disparition toast | 300ms | ease-in | Sortie discrète |"
+        },
+        {
+          "id": "design_qa_checklist",
+          "titre": "Design QA Checklist",
+          "description": "Vérification avant handoff dev",
+          "contenu_mock": "**Cohérence**\n- [ ] Tous les espacements respectent la grille 8px\n- [ ] Toutes les couleurs sont des tokens du design system\n- [ ] La typographie respecte les 3 graisses autorisées\n\n**Complétude**\n- [ ] Tous les états (vide, chargement, erreur, succès) sont spécifiés\n- [ ] Version mobile documentée pour chaque écran\n- [ ] Tous les textes UI sont finaux (0 lorem ipsum)"
+        }
+      ]
+    },
+    {
+      "numero": 5,
+      "id": "testing",
+      "label": "Tests Utilisateurs",
+      "description": "Validation de la solution avec les utilisateurs",
+      "couleur_accent": "#dc582a",
+      "livrables": [
+        {
+          "id": "test_plan",
+          "titre": "Test Plan",
+          "description": "Objectifs, scénarios, profils et métriques de succès",
+          "contenu_mock": "**Objectifs** : Valider la compréhension du mode perturbation et la rapidité de décision.\n\n**Scénarios** :\n1. Recevoir une alerte de retard de 45 min et trouver une alternative\n2. Configurer une alerte PMR pour un trajet futur\n\n**Profils** : 3 voyageurs fréquents / 2 PMR / 2 occasionnels (n=7)\n\n**Métriques** :\n- Taux de succès par tâche ≥ 80%\n- Time-on-task < 90s pour le scénario 1\n- Score SUS ≥ 70"
+        },
+        {
+          "id": "script_test",
+          "titre": "Script de test",
+          "description": "Introduction, tâches, débriefing",
+          "contenu_mock": "**Introduction** (5 min)\n\"Bonjour, merci de participer. Nous testons le prototype, pas vous. Pensez à voix haute.\"\n\n**Tâche 1** : \"Vous venez de recevoir une notification. Votre train a 45 minutes de retard. Montrez-moi ce que vous feriez.\"\n\n**Tâche 2** : \"Vous avez besoin d'assistance PMR pour votre prochain voyage. Configurez une alerte.\"\n\n**Débriefing** (10 min)\n- Qu'est-ce qui vous a semblé le plus clair ?\n- Qu'est-ce qui vous a surpris ou perturbé ?"
+        },
+        {
+          "id": "rapport_test",
+          "titre": "Rapport de test",
+          "description": "Contexte, résultats par tâche, recommandations priorisées",
+          "contenu_mock": "**Résumé exécutif** : 7 participants, 2 scénarios testés. Taux de succès global : 78%. Principal point de friction : découverte de la fonctionnalité d'alternatives.\n\n**Résultats Tâche 1**\n- Succès : 5/7\n- Friction : Le bouton \"Alternatives\" n'est pas visible sans scroll\n- Citation : \"Je ne voyais pas qu'il y avait d'autres trains\"\n\n**Recommandations**\n1. [Critique] Afficher les alternatives en sticky au bas de l'écran perturbation\n2. [Important] Ajouter une icône sur le bouton alternatives\n3. [Mineur] Reformuler le message d'erreur réseau"
+        },
+        {
+          "id": "affinity_map",
+          "titre": "Affinity Map Template",
+          "description": "Catégories de regroupement des observations de test",
+          "contenu_mock": "**Catégories d'affinity mapping** :\n\n🔴 Problèmes critiques (bloquants)\n🟠 Confusions (ralentissements)\n🟡 Améliorations (nice-to-have)\n🟢 Points forts (à conserver)\n💬 Citations marquantes\n\nMéthode : Post-its virtuels, 1 observation = 1 note. Regroupement par thème après 3 sessions minimum."
+        },
+        {
+          "id": "priorisation_matrix",
+          "titre": "Prioritisation Matrix",
+          "description": "Grille impact/effort pour les corrections post-test",
+          "contenu_mock": "| # | Problème identifié | Impact (1-5) | Effort (1-5) | Priorité | Action |\n|---|---|---|---|---|---|\n| 1 | Bouton alternatives non visible | 5 | 2 | Quick win | Sticky button |\n| 2 | Icône bouton manquante | 3 | 1 | Quick win | Ajout icône |\n| 3 | Message erreur peu clair | 2 | 2 | Moyen terme | Réécriture UX copy |\n| 4 | Onboarding PMR trop long | 4 | 4 | Long terme | Refonte flow |"
+        }
+      ]
+    },
+    {
+      "numero": 6,
+      "id": "handoff",
+      "label": "Handoff & Amélioration",
+      "description": "Transmission et suivi post-lancement",
+      "couleur_accent": "#651c32",
+      "livrables": [
+        {
+          "id": "handoff_doc",
+          "titre": "Handoff Doc",
+          "description": "Documentation complète pour les développeurs",
+          "contenu_mock": "**Architecture des composants**\n- NotificationBanner : composant conditionnel, visible uniquement si perturbation active\n- AlternativesList : liste ordonnée par heure de départ, max 3 alternatives affichées\n- PMRStatusBadge : indicateur d'état des équipements (ascenseur, rampe d'accès)\n\n**Comportements critiques**\n- Le mode perturbation doit s'activer en < 2s après réception de la donnée\n- Les alternatives doivent être triées par heure de départ croissante\n- L'alerte PMR doit être envoyée exactement au délai configuré par l'utilisateur\n\n**APIs impliquées**\n- SNCF Open Data : temps réel trains\n- Notifications : Firebase Cloud Messaging\n- Accessibilité : API Accès Plus SNCF"
+        },
+        {
+          "id": "dev_checklist",
+          "titre": "Dev Checklist",
+          "description": "Vérification technique avant mise en production",
+          "contenu_mock": "**Performance**\n- [ ] Temps de chargement initial < 3s sur 3G\n- [ ] Pas de layout shift (CLS < 0.1)\n- [ ] Images optimisées (WebP, lazy loading)\n\n**Fonctionnel**\n- [ ] Tous les scénarios de test validés en staging\n- [ ] Comportement hors ligne défini (mode dégradé)\n- [ ] Gestion des erreurs API documentée et testée\n\n**Accessibilité**\n- [ ] Test VoiceOver iOS + TalkBack Android\n- [ ] Navigation clavier complète\n- [ ] Audit axe-core : 0 violation critique"
+        },
+        {
+          "id": "ux_metrics_plan",
+          "titre": "UX Metrics Plan",
+          "description": "KPIs post-lancement avec méthode de mesure",
+          "contenu_mock": "| KPI | Baseline | Objectif 3 mois | Méthode de mesure |\n|---|---|---|---|\n| Taux d'ouverture notifications perturbation | — | > 65% | Firebase Analytics |\n| Time-to-action après notification | — | < 45s | Event tracking |\n| Score satisfaction post-voyage | 3.2/5 | > 4/5 | In-app survey |\n| Appels service client liés perturbations | 100% | -30% | Centre de contact SNCF |\n| Taux adoption alerte PMR | — | > 40% des utilisateurs PMR | Segment analytics |"
+        },
+        {
+          "id": "post_launch_research",
+          "titre": "Post-Launch Research Plan",
+          "description": "Plan de continuous discovery après lancement",
+          "contenu_mock": "**Fréquence** : Sessions bimensuelles de 2h\n\n**Méthodes continues** :\n- Entretiens utilisateurs (n=5 par quinzaine)\n- Analyse des verbatims support client (hebdo)\n- Revue des métriques produit (hebdo)\n- Test A/B sur les variantes de wording notification\n\n**Triggers de recherche ponctuelle** :\n- Chute du score satisfaction < 3.5\n- Nouveau cas d'usage PMR signalé\n- Refonte majeure d'une API tierce"
+        },
+        {
+          "id": "retrospective_template",
+          "titre": "Retrospective Template",
+          "description": "Bilan UX du projet",
+          "contenu_mock": "**Ce qui a bien fonctionné**\n- Le co-design avec les équipes exploitation a évité 3 itérations inutiles\n- Les tests avec des PMR dès la phase de prototypage\n\n**Ce qu'on referait différemment**\n- Impliquer le service client plus tôt pour identifier les cas d'usage edge\n- Faire un test de charge de la API perturbation avant le design\n\n**Décisions clés documentées**\n- Choix de sticky button vs onglet : décision prise suite aux tests du 2026-04-10\n- Délai d'alerte PMR paramétrable : demande expresse des participants PMR\n\n**Apprentissages transférables à d'autres projets SNCF**\n- Le pattern « mode urgence simplifié » peut être réutilisé sur l'appli agent"
+        }
+      ]
+    }
+  ],
+
+  "ecrans": [
+    {
+      "id": "landing",
+      "nom": "Landing — Aucun projet",
+      "description": "État initial affiché quand aucun projet n'est sélectionné ou créé",
+      "layout": "centré verticalement et horizontalement dans #main",
+      "composants": [
+        {
+          "type": "point_vivant",
+          "description": "Cercle de 6×6px, couleur --cerulean, animation pulse 2s infinie"
+        },
+        {
+          "type": "titre_h1",
+          "contenu": "ZENITH",
+          "style": "21px, poids 500, couleur --primaire, espacement -0.02em"
+        },
+        {
+          "type": "paragraphe",
+          "contenu": "Gérez vos projets UX phase par phase, de la discovery au handoff.",
+          "style": "14px, poids 300, couleur --sur-surface-secondaire"
+        },
+        {
+          "type": "bouton_cta",
+          "label": "Nouveau projet",
+          "style": "btn-primary, 14px, padding 10px 24px",
+          "action": "ouvre la modale #modal-new-project"
+        }
+      ],
+      "etats": {
+        "defaut": "Texte + bouton centrés",
+        "premier_lancement": "Déclenche automatiquement la modale de bienvenue si pas de clé API"
+      }
+    },
+    {
+      "id": "phases_overview",
+      "nom": "Vue d'ensemble — Grille des 6 phases",
+      "description": "Écran principal affiché quand un projet est sélectionné mais aucune phase ouverte",
+      "layout": "header en haut, grille 3 colonnes en dessous",
+      "composants": [
+        {
+          "id": "project_header",
+          "type": "en-tete_projet",
+          "elements": [
+            { "type": "titre", "contenu_mock": "Application Voyageur SNCF", "style": "21px, poids 500" },
+            { "type": "badge_type", "contenu_mock": "Application mobile", "style": "11px, uppercase, bordure --bordure-fantome, padding 2px 8px, rayon 4px" },
+            {
+              "type": "barre_progression",
+              "description": "Affiche X/6 phases terminées",
+              "style": "hauteur 3px, gradient cerulean→menthe, transition width 300ms"
+            },
+            {
+              "type": "boutons_actions",
+              "boutons": [
+                { "label": "Vue synthèse", "style": "btn-secondary", "action": "navigue vers ecran synthesis" },
+                { "label": "Exporter JSON", "style": "btn-secondary", "action": "déclenche téléchargement JSON du projet" },
+                { "label": "Renommer", "style": "btn-ghost", "action": "ouvre modale rename" },
+                { "label": "Supprimer", "style": "btn-danger-outline", "action": "ouvre modale delete" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "phases_grid",
+          "type": "grille_phases",
+          "layout": "grid-template-columns: repeat(3, 1fr), gap 16px",
+          "responsive": "1 colonne sous 900px",
+          "cartes": {
+            "description": "6 cartes identiques en structure, différenciées par la couleur d'accent",
+            "anatomie_carte": [
+              { "element": "bordure_top", "style": "3px solid, couleur selon phase" },
+              { "element": "label_numero", "contenu": "Phase N", "style": "11px, uppercase, --sur-surface-secondaire" },
+              { "element": "titre_phase", "style": "14px, poids 500, --primaire" },
+              { "element": "description_phase", "style": "12px, poids 300, --sur-surface-secondaire" },
+              { "element": "footer_carte", "description": "Badge statut (gauche) + compteur livrables (droite)", "style": "flex space-between" }
+            ],
+            "etats_carte": [
+              { "statut": "todo", "badge": "À faire", "couleur_badge": "--sur-surface-secondaire" },
+              { "statut": "inprogress", "badge": "En cours", "couleur_badge": "--cerulean" },
+              { "statut": "done", "badge": "✓ Terminé", "couleur_badge": "--menthe" }
+            ],
+            "interaction": "Clic sur la carte → navigue vers ecran phase_detail"
+          }
+        }
+      ]
+    },
+    {
+      "id": "phase_detail",
+      "nom": "Détail d'une phase",
+      "description": "Vue profonde dans une phase unique avec métadonnées et liste de livrables",
+      "layout": "flux vertical, scroll si nécessaire",
+      "composants": [
+        {
+          "id": "breadcrumb",
+          "type": "fil_ariane",
+          "structure": "Nom projet › Nom phase",
+          "style": "12px, poids 400",
+          "interactions": [
+            { "element": "nom_projet", "action": "retour vers phases_overview" },
+            { "element": "nom_phase", "style": "non cliquable, couleur --sur-surface" }
+          ]
+        },
+        {
+          "id": "phase_header",
+          "type": "en-tete_phase",
+          "elements": [
+            { "element": "numero_phase", "style": "11px, uppercase, couleur_accent de la phase" },
+            { "element": "titre_phase", "style": "19px, poids 500" },
+            {
+              "element": "selecteur_statut",
+              "type": "select",
+              "options": ["À faire", "En cours", "Terminé"],
+              "style": "styled comme un form-input, 13px",
+              "action": "sauvegarde immédiate sur changement"
+            }
+          ]
+        },
+        {
+          "id": "phase_metadata",
+          "type": "champs_phase",
+          "layout": "2 colonnes sur desktop, 1 colonne sur mobile",
+          "champs": [
+            {
+              "id": "contexte",
+              "label": "Contexte de phase",
+              "type": "textarea",
+              "placeholder": "Décrivez le contexte spécifique de cette phase…",
+              "style": "min-height 72px, resize vertical",
+              "action": "debounce 600ms → sauvegarde localStorage"
+            },
+            {
+              "id": "notes",
+              "label": "Notes libres",
+              "type": "textarea",
+              "placeholder": "Observations, liens, décisions…",
+              "style": "min-height 72px, resize vertical",
+              "action": "debounce 600ms → sauvegarde localStorage"
+            }
+          ]
+        },
+        {
+          "id": "deliverables_list",
+          "type": "liste_livrables",
+          "description": "Liste verticale de cartes livrables. Dans la maquette, afficher 1 livrable avec contenu pré-rempli, les autres vides.",
+          "anatomie_livrable": [
+            { "element": "titre_livrable", "style": "14px, poids 500" },
+            { "element": "description_livrable", "style": "12px, poids 300, --sur-surface-secondaire" },
+            {
+              "element": "bouton_generer",
+              "etats": {
+                "vide": { "label": "Générer", "style": "btn-secondary" },
+                "rempli": { "label": "Regénérer", "style": "btn-secondary" },
+                "loading": { "composant": "loading_indicator", "label": "Génération en cours…" }
+              },
+              "action_maquette": "Clic → affiche loading_indicator 1.5s → affiche contenu mock dans textarea"
+            },
+            {
+              "element": "textarea_output",
+              "description": "Zone de contenu du livrable, éditable",
+              "style": "min-height 110px, resize vertical, font 13px, poids 300",
+              "etats": {
+                "vide": "placeholder discret",
+                "rempli": "contenu markdown affiché en plain text éditable"
+              },
+              "action": "debounce 600ms → sauvegarde"
+            },
+            {
+              "element": "footer_livrable",
+              "elements": [
+                { "type": "timestamp", "contenu_mock": "Généré le 16 avr. 2026 à 10h32", "style": "11px, --sur-surface-secondaire" },
+                { "type": "bouton_copier", "label": "Copier", "style": "btn-ghost", "action": "copie textarea dans clipboard → toast 'Copié !'" }
+              ],
+              "visibilite": "Affiché uniquement si la textarea contient du contenu"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "synthesis",
+      "nom": "Vue synthèse",
+      "description": "Dashboard lecture seule de tous les livrables générés",
+      "layout": "flux vertical, organisé par phase",
+      "composants": [
+        {
+          "id": "synth_header",
+          "elements": [
+            { "element": "nom_projet", "style": "21px, poids 500" },
+            { "element": "badge_type", "contenu_mock": "Application mobile" },
+            { "element": "completion", "contenu_mock": "1 / 6 phases terminées", "style": "14px, --sur-surface-secondaire" },
+            {
+              "element": "boutons",
+              "boutons": [
+                { "label": "Exporter JSON", "style": "btn-secondary" },
+                { "label": "Imprimer / PDF", "style": "btn-secondary", "action": "window.print()" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "synth_phases",
+          "description": "6 sections répétables, une par phase",
+          "anatomie_section": [
+            { "element": "numero_phase", "style": "11px, uppercase, couleur_accent" },
+            { "element": "titre_phase", "style": "16px, poids 500" },
+            { "element": "badge_statut" },
+            {
+              "element": "livrables_preview",
+              "description": "Liste des livrables générés dans cette phase",
+              "anatomie_livrable": [
+                {
+                  "element": "titre_livrable",
+                  "style": "14px, poids 500, couleur --cerulean",
+                  "action": "Clic → navigue vers phase_detail + scroll vers le livrable"
+                },
+                {
+                  "element": "preview_texte",
+                  "style": "13px, poids 300, max-height 220px (collapsé), bordure gauche 2px --cerulean, padding-left 12px",
+                  "etats": {
+                    "collapsé": "Tronqué à 220px, bouton 'Voir plus'",
+                    "expandé": "max-height none, bouton 'Voir moins'"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "print_styles": {
+        "description": "Comportement en mode impression @media print",
+        "elements_masques": ["sidebar", "breadcrumb", "boutons_actions", "boutons_livrables", "footer", "modales", "toasts"],
+        "max_height_supprimes": true,
+        "page_breaks": "évités dans .synth-deliv et .synth-phase"
+      }
+    }
+  ],
+
+  "modales": [
+    {
+      "id": "modal-welcome",
+      "nom": "Bienvenue",
+      "declencheur": "Automatique au premier lancement si pas de clé API en localStorage",
+      "style_overlay": "position fixed, inset 0, background rgba(0, 27, 68, 0.45)",
+      "style_conteneur": "max-width 460px, min-width 380px, background --surface-flottante, padding 28px, border-radius 4px, shadow modal, animation slideup 150ms",
+      "contenu": [
+        { "type": "titre", "contenu": "Bienvenue sur ZENITH", "style": "18px, poids 500, --primaire" },
+        { "type": "paragraphe", "contenu": "ZENITH utilise Claude (Anthropic) pour générer vos livrables UX. Entrez votre clé API pour commencer.", "style": "14px, poids 300" },
+        {
+          "type": "champ_formulaire",
+          "label": "Clé API Anthropic",
+          "input_type": "password",
+          "placeholder": "sk-ant-…",
+          "hint": "Obtenez votre clé sur console.anthropic.com"
+        }
+      ],
+      "actions": [
+        { "label": "Plus tard", "style": "btn-secondary", "action": "ferme la modale" },
+        { "label": "Enregistrer", "style": "btn-primary", "action": "sauvegarde clé API + ferme modale + toast 'Clé enregistrée'" }
+      ]
+    },
+    {
+      "id": "modal-new-project",
+      "nom": "Nouveau projet",
+      "declencheur": "Bouton 'Nouveau projet' dans le footer de la sidebar",
+      "contenu": [
+        { "type": "titre", "contenu": "Nouveau projet", "style": "18px, poids 500" },
+        {
+          "type": "champ_formulaire",
+          "label": "Nom du projet",
+          "input_type": "text",
+          "placeholder": "Ex : Application Voyageur",
+          "requis": true,
+          "action_enter": "soumet le formulaire"
+        },
+        {
+          "type": "champ_formulaire",
+          "label": "Type de produit",
+          "input_type": "text",
+          "placeholder": "Ex : Application mobile, Web SaaS, Kiosque…",
+          "requis": false,
+          "hint": "Aide l'IA à contextualiser les livrables"
+        }
+      ],
+      "actions": [
+        { "label": "Annuler", "style": "btn-secondary", "action": "ferme la modale" },
+        { "label": "Créer le projet", "style": "btn-primary", "action": "crée le projet avec ID mock + ajoute en sidebar + navigue vers phases_overview" }
+      ],
+      "validation_maquette": "Si champ nom vide → focus input + ne pas soumettre"
+    },
+    {
+      "id": "modal-rename",
+      "nom": "Renommer le projet",
+      "declencheur": "Bouton 'Renommer' dans l'en-tête du projet",
+      "contenu": [
+        { "type": "titre", "contenu": "Renommer le projet", "style": "18px, poids 500" },
+        {
+          "type": "champ_formulaire",
+          "label": "Nom",
+          "input_type": "text",
+          "valeur_initiale": "Application Voyageur SNCF"
+        },
+        {
+          "type": "champ_formulaire",
+          "label": "Type de produit",
+          "input_type": "text",
+          "valeur_initiale": "Application mobile"
+        }
+      ],
+      "actions": [
+        { "label": "Annuler", "style": "btn-secondary", "action": "ferme la modale" },
+        { "label": "Enregistrer", "style": "btn-primary", "action": "met à jour nom + type + ferme modale + rafraîchit UI" }
+      ]
+    },
+    {
+      "id": "modal-delete",
+      "nom": "Supprimer le projet",
+      "declencheur": "Bouton 'Supprimer' dans l'en-tête du projet",
+      "contenu": [
+        { "type": "titre", "contenu": "Supprimer le projet ?", "style": "18px, poids 500" },
+        {
+          "type": "paragraphe",
+          "contenu": "Le projet « Application Voyageur SNCF » et tous ses livrables seront supprimés définitivement.",
+          "style": "14px, poids 300"
+        }
+      ],
+      "actions": [
+        { "label": "Annuler", "style": "btn-secondary", "action": "ferme la modale" },
+        { "label": "Supprimer", "style": "btn-danger-outline", "action": "supprime projet + retour landing + toast 'Projet supprimé'" }
+      ]
+    },
+    {
+      "id": "modal-settings",
+      "nom": "Réglages API",
+      "declencheur": "Bouton '⚙ Réglages API' dans le footer de la sidebar",
+      "contenu": [
+        { "type": "titre", "contenu": "Réglages API", "style": "18px, poids 500" },
+        {
+          "type": "champ_formulaire",
+          "label": "Clé API Anthropic",
+          "input_type": "password",
+          "valeur_initiale": "sk-ant-●●●●●●●●",
+          "hint": "Stockée localement dans votre navigateur (localStorage)"
+        },
+        {
+          "type": "infos",
+          "items": [
+            { "label": "Modèle utilisé", "valeur": "claude-sonnet-4-20250514" },
+            { "label": "Données stockées", "valeur": "localStorage de votre navigateur" }
+          ]
+        }
+      ],
+      "actions": [
+        { "label": "Fermer", "style": "btn-secondary", "action": "ferme la modale sans sauvegarder" },
+        { "label": "Enregistrer", "style": "btn-primary", "action": "sauvegarde clé API + toast 'Clé mise à jour'" }
+      ]
+    }
+  ],
+
+  "composants": {
+    "sidebar": {
+      "description": "Navigation latérale fixe, toujours visible",
+      "dimensions": { "largeur": "240px", "largeur_mobile": "100%" },
+      "couleur_fond": "--surface-basse",
+      "sections": [
+        {
+          "id": "sb-header",
+          "fond": "--primaire",
+          "elements": [
+            { "type": "logo", "contenu": "ZENITH", "style": "14px, poids 500, --sur-primaire, espacement 0.15em, uppercase" },
+            { "type": "tagline", "contenu": "Gestion de projets UX", "style": "10px, --sur-primaire-conteneur" }
+          ]
+        },
+        {
+          "id": "sb-search",
+          "type": "champ_recherche",
+          "placeholder": "Rechercher un projet…",
+          "style": "border-bottom 2px transparent, focus → couleur --cerulean",
+          "action": "filtrage temps réel de la liste projets"
+        },
+        {
+          "id": "sb-projects",
+          "label_section": "PROJETS",
+          "type": "liste_projets",
+          "item_anatomie": {
+            "layout": "flex space-between",
+            "elements": [
+              { "type": "nom_projet", "style": "13px, truncate overflow", "max_chars": 22 },
+              { "type": "badge_progression", "contenu": "X/6", "style": "11px, --sur-surface-secondaire" }
+            ],
+            "etats": {
+              "defaut": "fond transparent",
+              "hover": "fond légèrement plus clair",
+              "actif": "bordure gauche 2px --cerulean, fond --surface, texte --primaire poids 500"
+            }
+          },
+          "etat_vide": "Aucun projet — créez-en un",
+          "etat_recherche_vide": "Aucun résultat"
+        },
+        {
+          "id": "sb-footer",
+          "position": "sticky bottom: 0",
+          "boutons": [
+            { "label": "Nouveau projet", "style": "btn-primary, largeur 100%", "action": "ouvre modal-new-project" },
+            { "label": "Importer (JSON)", "style": "btn-secondary, largeur 100%", "action": "ouvre file picker, simule import dans maquette" },
+            { "label": "⚙ Réglages API", "style": "btn-ghost, largeur 100%", "action": "ouvre modal-settings" }
+          ],
+          "signature": {
+            "contenu": "Fabrique de l'Adoption Numérique",
+            "style": "9px, uppercase, espacement 0.1em, --sur-surface-secondaire, opacity 0.5, centré"
+          }
+        }
+      ]
+    },
+
+    "boutons": {
+      "btn-primary": {
+        "background": "--primaire",
+        "couleur": "--sur-primaire",
+        "hover": { "background": "--primaire-conteneur" },
+        "active": { "transform": "scale(0.98)" },
+        "padding": "7px 14px",
+        "font": "12px",
+        "border-radius": "6px"
+      },
+      "btn-secondary": {
+        "background": "--surface-haute",
+        "couleur": "--sur-surface",
+        "hover": { "background": "--surface-basse", "couleur": "--cerulean" },
+        "padding": "7px 14px",
+        "font": "12px",
+        "border-radius": "6px"
+      },
+      "btn-ghost": {
+        "background": "transparent",
+        "couleur": "--cerulean",
+        "hover": { "text-decoration": "underline" },
+        "padding": "7px 14px",
+        "font": "12px"
+      },
+      "btn-danger-outline": {
+        "background": "transparent",
+        "couleur": "--ocre",
+        "hover": { "background": "rgba(220, 88, 42, 0.08)" },
+        "border": "1px solid --ocre",
+        "padding": "7px 14px",
+        "font": "12px",
+        "border-radius": "6px"
+      }
+    },
+
+    "form_controls": {
+      "text_input": {
+        "background": "--surface-haute",
+        "border": "none",
+        "border-bottom": "2px solid transparent",
+        "border-radius": "4px 4px 0 0",
+        "font": "14px, poids 300",
+        "padding": "8px 10px",
+        "focus": { "background": "--surface-flottante", "border-bottom-color": "--cerulean" }
+      },
+      "textarea": {
+        "background": "--surface-haute",
+        "border-bottom": "2px solid transparent",
+        "border-radius": "4px 4px 0 0",
+        "font": "13px, poids 300",
+        "min-height": "72px",
+        "resize": "vertical",
+        "focus": { "background": "--surface-flottante", "border-bottom-color": "--cerulean" }
+      },
+      "select": {
+        "style": "identique au text_input",
+        "apparence": "apparence native supprimée"
+      }
+    },
+
+    "loading_indicator": {
+      "structure": "3 points animés + texte",
+      "texte": "Génération en cours…",
+      "couleur_points": "--cerulean",
+      "animation": "dot-loading, décalage 0s / 0.2s / 0.4s"
+    },
+
+    "toast": {
+      "position": "fixed, bottom 24px, right 24px",
+      "background": "--primaire",
+      "couleur": "--sur-primaire",
+      "padding": "10px 18px",
+      "border-radius": "4px",
+      "shadow": "shadow_toast",
+      "animation_entree": "slideup 150ms ease-out",
+      "animation_sortie": "fadeout 300ms ease-out",
+      "auto_dismiss": "2500ms",
+      "messages_types": [
+        { "id": "copie", "contenu": "Copié !" },
+        { "id": "sauvegarde", "contenu": "Modifications enregistrées" },
+        { "id": "erreur_api", "contenu": "Erreur de génération. Vérifiez votre clé API." },
+        { "id": "suppression", "contenu": "Projet supprimé" },
+        { "id": "cle_sauvegardee", "contenu": "Clé API enregistrée" }
+      ]
+    },
+
+    "progress_bar": {
+      "height": "3px",
+      "background": "--surface-haute",
+      "fill": "gradient 90deg, --cerulean → --menthe",
+      "border-radius": "2px",
+      "transition": "width 300ms ease-out",
+      "label": "11px, --sur-surface-secondaire, affiche 'X / 6 phases terminées'"
+    },
+
+    "point_vivant": {
+      "dimensions": "6×6px",
+      "shape": "circle (border-radius 50%)",
+      "couleur": "--cerulean",
+      "animation": "pulse 2s infinite"
+    }
+  },
+
+  "flux_navigation": {
+    "description": "Graphe de navigation entre les écrans et modales",
+    "etats": [
+      { "depuis": "landing", "vers": "modal-welcome", "declencheur": "Automatique (pas de clé API)" },
+      { "depuis": "landing", "vers": "modal-new-project", "declencheur": "Clic bouton 'Nouveau projet'" },
+      { "depuis": "modal-new-project", "vers": "phases_overview", "declencheur": "Soumission formulaire valide" },
+      { "depuis": "phases_overview", "vers": "phase_detail", "declencheur": "Clic sur une carte de phase" },
+      { "depuis": "phases_overview", "vers": "synthesis", "declencheur": "Clic 'Vue synthèse'" },
+      { "depuis": "phases_overview", "vers": "modal-rename", "declencheur": "Clic 'Renommer'" },
+      { "depuis": "phases_overview", "vers": "modal-delete", "declencheur": "Clic 'Supprimer'" },
+      { "depuis": "phase_detail", "vers": "phases_overview", "declencheur": "Clic sur le nom du projet dans le fil d'Ariane" },
+      { "depuis": "synthesis", "vers": "phase_detail", "declencheur": "Clic sur le titre d'un livrable" },
+      { "depuis": "sidebar", "vers": "phases_overview", "declencheur": "Clic sur un projet dans la liste" },
+      { "depuis": "sidebar", "vers": "landing", "declencheur": "Suppression du dernier projet" },
+      { "depuis": "sidebar", "vers": "modal-settings", "declencheur": "Clic 'Réglages API'" },
+      { "depuis": "sidebar", "vers": "modal-new-project", "declencheur": "Clic 'Nouveau projet'" }
+    ],
+    "fermeture_modales": {
+      "methodes": ["Clic sur le bouton 'Annuler' / 'Fermer'", "Clic sur l'overlay semi-transparent"],
+      "note": "La touche Escape peut optionnellement fermer la modale active"
+    }
+  },
+
+  "interactions_cles": [
+    {
+      "id": "generation_livrable_mockee",
+      "description": "Simuler la génération IA dans la maquette sans vrai appel API",
+      "etapes": [
+        "Clic sur 'Générer'",
+        "Afficher loading_indicator (remplace le bouton)",
+        "Attendre 1500ms (setTimeout)",
+        "Masquer loading_indicator",
+        "Afficher le contenu mock dans la textarea",
+        "Afficher le footer livrable (timestamp + bouton copier)",
+        "Mettre à jour le compteur de livrables dans la carte phase",
+        "Toast optionnel : 'Livrable généré !'"
+      ]
+    },
+    {
+      "id": "creation_projet",
+      "description": "Créer un nouveau projet depuis la modale",
+      "etapes": [
+        "Validation : nom non vide",
+        "Générer un ID temporaire (ex: 'proj-' + Date.now())",
+        "Ajouter le projet à la liste sidebar",
+        "Fermer la modale",
+        "Naviguer vers phases_overview avec ce projet sélectionné"
+      ]
+    },
+    {
+      "id": "filtrage_sidebar",
+      "description": "Recherche en temps réel dans la sidebar",
+      "etapes": [
+        "Écoute sur l'event 'input' du champ recherche",
+        "Filtrer la liste de projets (case-insensitive, match partiel)",
+        "Afficher l'état vide si aucun résultat",
+        "Pas de debounce nécessaire (simple manipulation DOM)"
+      ]
+    },
+    {
+      "id": "export_json",
+      "description": "Exporter les données du projet en JSON",
+      "etapes": [
+        "Serialiser les données mock en JSON.stringify(projet, null, 2)",
+        "Créer un Blob de type application/json",
+        "Créer un lien temporaire et déclencher le téléchargement",
+        "Nom de fichier : 'nom-projet.json'"
+      ]
+    },
+    {
+      "id": "expand_livrable_synthese",
+      "description": "Expand/collapse des previews dans la vue synthèse",
+      "etapes": [
+        "Clic sur 'Voir plus' → max-height: none, transition smooth",
+        "Changer le label en 'Voir moins'",
+        "Clic sur 'Voir moins' → max-height: 220px",
+        "Animation : transition max-height 300ms ease-out"
+      ]
+    },
+    {
+      "id": "copie_clipboard",
+      "description": "Copier le contenu d'un livrable",
+      "etapes": [
+        "Clic sur bouton 'Copier'",
+        "navigator.clipboard.writeText(contenu_textarea)",
+        "Toast : 'Copié !'"
+      ]
+    }
+  ],
+
+  "responsive": {
+    "breakpoint_mobile": "900px",
+    "changements": [
+      { "element": "sidebar", "desktop": "240px fixe, en ligne", "mobile": "100% largeur, empilé au-dessus de #main" },
+      { "element": "phases_grid", "desktop": "3 colonnes", "mobile": "1 colonne" },
+      { "element": "phase_fields", "desktop": "2 colonnes", "mobile": "1 colonne" },
+      { "element": "page_padding", "desktop": "40px", "mobile": "20px" },
+      { "element": "layout_app", "desktop": "flex-direction: row", "mobile": "flex-direction: column" }
+    ]
+  },
+
+  "structure_html_cible": {
+    "description": "Structure DOM recommandée pour la maquette",
+    "arbre": {
+      "body": {
+        "children": [
+          {
+            "id": "app",
+            "type": "div",
+            "style": "display flex, height 100vh",
+            "children": [
+              { "id": "sidebar", "type": "aside", "description": "Navigation latérale complète" },
+              { "id": "main", "type": "main", "description": "Zone de contenu dynamique, contenu remplacé par JS selon l'écran actif" }
+            ]
+          },
+          { "id": "modal-overlay", "type": "div", "description": "Overlay des modales, affiché/masqué selon l'état" },
+          { "id": "toast-container", "type": "div", "description": "Conteneur des toasts, position fixed" }
+        ]
+      }
+    },
+    "pattern_rendu": "Single Page Application : le JS injecte du HTML dans #main selon l'écran actif (render functions). Pas de rechargement de page."
+  },
+
+  "instructions_maquettage": {
+    "fichier_unique": true,
+    "description": "Tout le code (HTML, CSS, JS) dans un seul fichier index.html. Aucune dépendance externe.",
+    "ordre_implementation": [
+      "1. Variables CSS (design tokens complets)",
+      "2. Reset CSS + base typographique",
+      "3. Layout app (sidebar + main, flex)",
+      "4. Sidebar statique (toutes les sections)",
+      "5. Écran landing (état vide)",
+      "6. Modale générique (overlay + conteneur + animations)",
+      "7. Modale 'Nouveau projet'",
+      "8. Données mock statiques (objet JS)",
+      "9. Routeur JS simple (currentScreen, currentProject, currentPhase)",
+      "10. Rendu : phases_overview (grille 6 cartes)",
+      "11. Rendu : phase_detail (1 phase avec livrables)",
+      "12. Interaction génération mockée (setTimeout + injection contenu)",
+      "13. Rendu : synthesis view",
+      "14. Toutes les modales restantes",
+      "15. Toast système",
+      "16. Responsive CSS (@media max-width: 900px)",
+      "17. Print styles (@media print)"
+    ],
+    "bonnes_pratiques": [
+      "Utiliser exclusivement des variables CSS (--token) pour toutes les couleurs et spacings",
+      "Event delegation sur document pour les clics (un seul listener, pas N listeners)",
+      "État de l'app dans un objet JS global unique (ex: const S = {})",
+      "Fonctions de rendu pures qui retournent du HTML string et l'injectent via innerHTML",
+      "Pas de framework, pas d'import/export, tout dans le scope global de la balise <script>",
+      "Les animations CSS (slideup, fadeout, pulse) déclarées dans <style> avec @keyframes",
+      "setTimeout pour simuler les délais de génération IA (1200-1800ms)"
+    ]
+  }
+}
