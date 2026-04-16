@@ -1,114 +1,82 @@
-# UX Pilot — Mission Control
+# ZENITH — Gestion de projets UX
 
-> Pipeline UX complet propulsé par IA. De la demande métier à la V1 en 8 étapes automatisées.
+> Outil de gestion de projets UX multi-phases avec génération de livrables par IA.  
+> Fabrique de l'Adoption Numérique · e.SNCF Solutions
 
 ## Présentation
 
-UX Pilot génère l'intégralité d'une phase de découverte UX à partir d'une simple expression de besoin métier. Il suffit de décrire votre projet en langage naturel : l'IA enchaîne 8 livrables en quelques minutes.
+ZENITH accompagne les projets UX de la découverte au handoff en 6 phases structurées. Pour chaque phase, l'IA génère des livrables professionnels directement utilisables, contextualisés au projet et enrichis par les phases précédentes.
 
-| Étape | Livrable |
-|---|---|
-| 1 | **Cadrage Express** — brief structuré (contexte, problème, objectif, KPIs) |
-| 2 | **Personas** — 3 profils utilisateurs avec objectifs et frustrations |
-| 3 | **User Stories** — 10-12 stories priorisées MoSCoW |
-| 4 | **Parcours Utilisateur** — journey map avec courbe émotionnelle |
-| 5 | **Architecture de l'information** — sitemap & navigation |
-| 6 | **Wireframes** — maquettes fil de fer HTML basse fidélité |
-| 7 | **Audit RGAA** — conformité accessibilité RGAA 4.1 niveau AA |
-| 8 | **V1 Production** — application HTML/CSS/JS opérationnelle (navigation, boutons, formulaires, données mockées) — design system optionnel |
+| Phase | Intitulé | Livrables |
+|-------|----------|-----------|
+| 1 | **Discovery & Cadrage** | Problem Statement, Research Plan, Stakeholder Map, JTBD Canvas |
+| 2 | **Research Utilisateur** | Guide d'entretien, Synthesis Template, Personas, Journey Map, Insight Cards |
+| 3 | **Idéation & Architecture** | Sitemap, User Flows, Design Principles, HMW, Concept Brief |
+| 4 | **Design UI & Prototypage** | Content Inventory, Annotation Template, Accessibility Checklist, Motion Guidelines, Design QA |
+| 5 | **Tests Utilisateurs** | Test Plan, Script de test, Rapport de test, Affinity Map, Prioritisation Matrix |
+| 6 | **Handoff & Amélioration** | Handoff Doc, Dev Checklist, UX Metrics Plan, Post-Launch Research, Retrospective |
+
+**29 livrables au total**, générés par Claude avec contexte cumulatif (chaque phase s'appuie sur les livrables des phases précédentes).
 
 ## Stack
 
-- **React 18** (UMD CDN) + **Babel Standalone** — pas de build step
-- **Claude Sonnet 4** via l'API Anthropic (BYOK — clé côté navigateur) — jusqu'à 32 000 tokens pour la V1
-- **JSZip** (CDN) — génération de l'archive ZIP des livrables
-- HTML / CSS / JS vanilla, aucune dépendance npm
+- **Vanilla JS** — aucun framework, aucun build step, aucune dépendance npm
+- **Claude Sonnet 4** via l'API Anthropic (BYOK — clé stockée en `localStorage`)
+- **localStorage** — persistance des projets côté navigateur
+- **Design System FAN** — charte graphique Fabrique de l'Adoption Numérique (Avenir, palette institutionnelle)
 
-## Structure
+## Démarrage
 
-```
-ux-pilot/
-├── index.html        # Shell HTML + chargement des scripts
-├── css/
-│   └── styles.css    # Styles globaux, animations, classes utilitaires
-└── js/
-    ├── config.js     # Constantes : STEPS, EXAMPLES, FEATURES, tokens de style
-    ├── api.js        # callAPI() + constructeurs de prompts (PR)
-    ├── views.js      # Composants de rendu par étape
-    ├── export.js     # Générateur d'archive ZIP (templates HTML + maquette séparée)
-    └── app.js        # App, Sidebar, Landing, Pipeline + ReactDOM.createRoot
-```
-
-## Lancer le projet
-
-Aucune installation requise. Ouvrez `index.html` dans un navigateur ou servez le dossier avec n'importe quel serveur statique :
+Aucune installation requise. Ouvrez `index.html` dans un navigateur ou servez le dossier :
 
 ```bash
-# avec VS Code Live Server (extension) — clic droit > Open with Live Server
-# ou avec npx
+# VS Code Live Server — clic droit > Open with Live Server
+# ou
 npx serve .
-# ou avec Python
+# ou
 python -m http.server 8080
 ```
 
-Au premier lancement, l'application demande une **clé API Anthropic** (`sk-ant-…`). Elle est stockée en `sessionStorage` et effacée à la fermeture de l'onglet.
+Au premier lancement, ZENITH demande une **clé API Anthropic** (`sk-ant-…`). Elle est stockée dans `localStorage` et jamais envoyée à un tiers — les appels partent directement du navigateur vers `api.anthropic.com`.
 
-## Déploiement GitHub Pages
-
-UX Pilot est 100% statique — aucun serveur requis. Déploiement en 3 étapes :
-
-```bash
-git init && git add . && git commit -m "feat: initial release"
-git branch -M main
-git remote add origin https://github.com/TON-USERNAME/ux-pilot.git
-git push -u origin main
-```
-
-Puis dans le repository : **Settings → Pages → Deploy from branch → main / (root) → Save**.
-
-L'app est accessible sur `https://TON-USERNAME.github.io/ux-pilot` après ~1 minute.  
-Un tutoriel interactif est disponible directement dans l'app via le bouton **GitHub Pages** dans la barre du haut.
-
-## Export des livrables
-
-En fin de pipeline, le bouton **Télécharger les livrables** génère une archive ZIP :
+## Structure du projet
 
 ```
-ux-pilot-[nom-projet].zip
-└── ux-pilot-[nom-projet]/
-    ├── index.html   ← dashboard de navigation entre tous les livrables
-    └── webapp/
-        └── index.html   ← V1 production (app générée)
+ux-pilot/
+├── index.html        # Application complète (HTML + CSS + JS dans un seul fichier)
+├── css/              # Styles de l'ancienne version (non utilisés)
+├── js/               # Scripts de l'ancienne version (non utilisés)
+├── README.md
+└── CHANGELOG.md
 ```
 
-Le `index.html` est un dashboard autonome (dark theme, aucune dépendance externe) avec une sidebar de navigation entre les 7 livrables UX (cadrage, personas, user stories, parcours, architecture, wireframes en iframe, audit RGAA) et un bouton **Ouvrir l'app V1** qui pointe vers `webapp/index.html`.
+ZENITH est une **single-file app** — toute la logique est dans `index.html`.
 
-### Détection des implémentations requises
+## Fonctionnalités
 
-À la génération du ZIP, `export.js` analyse statiquement la V1 et affiche dans la sidebar du dashboard les points nécessitant une implémentation complémentaire, classés en trois niveaux :
+### Gestion de projets
+- Créer, renommer, supprimer des projets
+- Recherche par nom dans la sidebar
+- Indicateur de progression par phase (0/6)
+- Export JSON du projet complet
+- Import JSON (restauration ou partage)
 
-| Niveau | Cas détectés |
-|--------|-------------|
-| 🔴 Erreur | `process.env`, placeholders de clé API |
-| 🟡 Avertissement | Appels backend `/api/`, auth sans service, BDD externe, formulaires sans handler |
-| 🔵 Info | Persistance `localStorage` uniquement, pattern BYOK |
+### Phases et livrables
+- Vue d'ensemble des 6 phases avec statut et progression des livrables
+- Champ "Contexte de phase" et "Notes libres" par phase
+- Statut par phase : À faire / En cours / Terminé
+- Génération IA de chaque livrable avec contexte cumulatif
+- Édition manuelle et sauvegarde automatique (debounce 600 ms)
+- Copie en un clic
 
-## Design system
-
-Un champ optionnel **"Design System — V1 uniquement"** est disponible sur l'écran d'accueil, avant le lancement du pipeline. Il permet d'injecter vos tokens de design directement dans le prompt de génération de la V1 :
-
-```
-- Couleur principale : #005EB8 (bleu), secondaire : #00A550 (vert)
-- Typographie : Marianne, titre 32px/700, corps 14px/400
-- Rayon de bordure : 4px, ombres légères
-- Bouton primaire : fond #005EB8, texte blanc, hover #004C99
-- Grille 12 colonnes, gutter 16px
-```
-
-Si le champ est vide, la V1 utilise le design SNCF par défaut (`#00205b` / `#e2001a`). Les 7 autres étapes du pipeline (cadrage, personas, stories…) ne sont pas affectées.
+### Vue synthèse
+- Tableau de bord de tous les livrables générés, organisé par phase
+- Navigation directe vers un livrable depuis la synthèse
+- Export PDF via l'impression navigateur
 
 ## Sécurité
 
-- La clé API n'est jamais envoyée à un serveur tiers — les appels partent directement du navigateur vers `api.anthropic.com`.
-- L'en-tête `anthropic-dangerous-direct-browser-access: true` est requis pour les appels CORS depuis le navigateur.
-- **Ne pas utiliser en production** avec une clé ayant des droits étendus.
+- La clé API n'est jamais envoyée à un serveur tiers
+- L'en-tête `anthropic-dangerous-direct-browser-access: true` est requis pour les appels CORS depuis le navigateur
+- Les données projet sont stockées uniquement dans `localStorage` du navigateur local
+- Ne pas utiliser en production avec une clé ayant des droits étendus

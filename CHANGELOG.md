@@ -1,74 +1,82 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.  
-Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+Format basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [1.4.0] — 2026-04-14
+## [2.1.0] — 2026-04-16
 
 ### Added
-- **Design system optionnel** — bloc collapsible "DESIGN SYSTEM — V1 UNIQUEMENT" dans le Landing
-  - Textarea avec placeholder guidé (couleurs hex, typo, rayons, boutons, grille…)
-  - Badge "actif" visible même quand le bloc est replié
-  - Injecté uniquement dans le prompt V1 (les 7 autres étapes ne le voient pas)
-  - Si absent : fallback design SNCF par défaut (`#00205b` / `#e2001a`)
-  - Réinitialisé à "Nouvelle mission"
-- **Persistance clé API** — `sessionStorage` → `localStorage` : la clé survit aux refreshs, effacée uniquement via "Changer clé API"
+- **Design System FAN** — charte graphique Fabrique de l'Adoption Numérique appliquée intégralement
+  - Palette institutionnelle : `--primaire` (#001b44), `--cerulean` (#0088cc), `--menthe` (#00b388), `--lavande` (#8374d1), `--ambre`, `--ocre`, `--bourgogne`
+  - Typographie Avenir (police système) — Light 300 / Roman 400 / Medium 500, aucune graisse > 500
+  - Principe "Zéro bordure" : séparation par empilement tonal (`--surface-basse` / `--surface` / `--surface-flottante` / `--surface-haute`), pas de `border: 1px solid`
+  - Sidebar header en `--primaire` (navy institutionnel) avec texte blanc
+  - Cartes de phase : bordure top 3px colorée par phase (cerulean → menthe → lavande → ambre → ocre → bourgogne)
+  - Barre de progression : dégradé `--cerulean → --menthe`
+  - Boutons FAN : primaire navy / secondaire surface-haute / ghost cerulean / danger ocre
+  - Formulaires : fond `--surface-haute`, bordure bottom au focus uniquement
+  - Modal : fond `--surface-flottante`, overlay navy translucide, ombre ambiante teintée
+  - Toast : fond `--primaire`
+  - Landing : eyebrow animé (point vivant) + mention "Fabrique de l'Adoption Numérique"
+  - Footer sidebar : signature FAN en 9px uppercase
+  - Scrollbar : couleur `--surface-haute` / hover `--bleu-horizon`
+  - Responsive : breakpoint 900px avec layout vertical
+
+### Removed
+- Police Spectral (Google Fonts) — suppression des deux balises `<link>` Google Fonts
 
 ---
 
-## [1.3.0] — 2026-04-14
+## [2.0.0] — 2026-04-15
 
-### Fixed
-- **Wireframe & V1 vides** : `callAPI` en mode `raw` strip désormais les balises markdown (` ```html `) que le modèle ajoutait autour du HTML — l'iframe affiche maintenant le rendu correct
-- **V1 = maquette non fonctionnelle** : prompt système V1 entièrement réécrit avec 10 exigences explicites (navigation SPA, boutons avec handlers JS réels, formulaires avec validation, données mockées, zéro placeholder)
+> Refonte complète. L'ancienne app React (pipeline 8 étapes) est remplacée par ZENITH,  
+> un gestionnaire de projets UX multi-phases en vanilla JS.
 
-### Changed
-- `max_tokens` V1 : 4 096 → **32 000** — place suffisante pour une application complète et opérationnelle
-- `max_tokens` wireframe : 4 000 → 6 000
-- `max_tokens` relevés sur toutes les étapes JSON : cadrage/personas/architecture 2 000 → 4 000, stories/journey/RGAA 3 000 → 6 000
-- Prompt wireframe : ajout instruction explicite "HTML brut sans markdown"
+### Added
+- **6 phases UX** : Discovery, Research, Idéation, Design, Tests, Handoff
+- **29 livrables IA** contextualisés, avec prompts structurés par livrable
+- **Contexte cumulatif** : chaque phase s'appuie sur les livrables des phases précédentes
+- **Gestion multi-projets** : CRUD complet, recherche, sidebar avec progression
+- **Persistance localStorage** : données survivent aux rechargements
+- **Export / Import JSON** : sauvegarde et partage de projets
+- **Vue synthèse** : tous les livrables générés en une page, navigation directe, export PDF
+- **Sauvegarde automatique** : debounce 600 ms sur tous les champs texte
+- **Statut par phase** : À faire / En cours / Terminé
+- **Modale de bienvenue** : saisie de la clé API au premier lancement
+- **Toast notifications** : retour haptique sur toutes les actions
+- Nom du produit : **ZENITH**
+
+### Removed
+- App React + Babel CDN (pipeline 8 étapes)
+- Dépendances : JSZip, Google Fonts (Spectral)
+- Export ZIP des livrables
+- Modale tutoriel GitHub Pages
+- Design system optionnel (champ V1)
 
 ---
 
-## [1.2.0] — 2026-04-14
+## Historique — UX Pilot Pipeline (v1.x)
 
-### Added
-- `detectRequirements(v1Html)` dans `export.js` — analyse statique du HTML généré à l'export
-  - **Erreurs bloquantes** : `process.env` / `import.meta.env`, placeholders de clé API (`YOUR_API_KEY`…)
-  - **Avertissements** : appels backend `/api/`, fonctions d'auth sans service, Firebase/Supabase/MongoDB, `<form>` sans handler `onsubmit`
-  - **Infos** : persistance `localStorage` uniquement, pattern BYOK
-  - Résultats affichés dans la sidebar du dashboard (label + détail explicatif), groupés par niveau, visibles depuis tous les onglets
+> Ces versions correspondent à l'ancienne application React (pipeline linéaire 8 étapes).  
+> Remplacée par ZENITH en v2.0.0.
 
-## [1.1.0] — 2026-04-14
+### [1.4.0] — 2026-04-14
+- Design system optionnel pour la V1 (bloc collapsible avec textarea de tokens)
+- Persistance clé API : `sessionStorage` → `localStorage`
 
-### Added
-- `export.js` — générateur d'archive ZIP en fin de pipeline via JSZip (CDN)
-  - `index.html` dashboard : sidebar de navigation entre tous les livrables (cadrage, personas, user stories, parcours, architecture, wireframes en iframe srcdoc, audit RGAA), dark theme cohérent avec l'app
-  - Dossier `webapp/` contenant la V1 production, ouverture via bouton "Ouvrir l'app V1"
-  - Téléchargement déclenché via `Blob` + `URL.createObjectURL`
-- Bouton **Télécharger les livrables (.zip)** dans le banner de fin de pipeline (avec état loading)
-- `GithubPagesTuto` — modale tutoriel statique (zéro appel LLM) pour déployer l'**app générée** sur GitHub Pages
-  - 5 étapes : télécharger les livrables → créer un repo → pousser `webapp/` → activer Pages → URL
-  - Blocs de commandes git copiables en 1 clic (feedback visuel ✓)
-- Bouton **GitHub Pages** (icône + label) dans la top bar, accessible depuis tous les écrans
+### [1.3.0] — 2026-04-14
+- Correction wireframe et V1 vides (strip des balises markdown autour du HTML)
+- Prompt V1 réécrit : navigation SPA, handlers JS réels, formulaires avec validation, données mockées
+- `max_tokens` V1 : 4 096 → 32 000
 
----
+### [1.2.0] — 2026-04-14
+- `detectRequirements()` dans `export.js` : analyse statique du HTML généré, 3 niveaux (erreur / avertissement / info)
 
-## [1.0.0] — 2026-04-14
+### [1.1.0] — 2026-04-14
+- Export ZIP : dashboard `index.html` + dossier `webapp/` (V1 production)
+- Modale tutoriel GitHub Pages avec commandes copiables
 
-### Added
-- Initial release — full 8-step UX pipeline powered by Claude Sonnet 4
-- `CadrageView` — structured brief (context, problem, objective, KPIs, constraints)
-- `PersonasView` — 3 user personas with goals, frustrations, and citation
-- `StoriesView` — MoSCoW-prioritised user stories in kanban columns
-- `JourneyView` — user journey map with SVG emotion curve
-- `ArchitectureView` — sitemap with pages, components, and sub-pages
-- `HtmlPreview` — sandboxed iframe preview for wireframes and V1 (desktop / mobile toggle)
-- `RgaaView` — RGAA 4.1 audit with donut score and criteria table
-- `ApiKeyModal` — BYOK flow with sessionStorage persistence
-- `Sidebar` — step-by-step navigation with live/done/pending states
-- `Landing` — input form with quick-fill examples and feature cards
-- `Pipeline` — live result feed with per-step loading skeletons and timing
-- CSS hover states for nav items, example buttons, and preview mode toggle
+### [1.0.0] — 2026-04-14
+- Pipeline 8 étapes : Cadrage, Personas, User Stories, Journey Map, Architecture, Wireframes, Audit RGAA, V1 Production
+- BYOK Anthropic API, React 18 CDN + Babel, JSZip
