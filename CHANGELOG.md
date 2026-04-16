@@ -4,6 +4,18 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2.3.2] — 2026-04-16
+
+### Fixed
+- **Export "Spec maquette"** — refonte complète du JSON généré : centré sur le produit UX à maquetter, plus sur ZENITH
+  - Clé `A_LIRE_EN_PREMIER` avec instructions explicites 🚫 / ✅ pour guider le LLM
+  - `ux_reference` contient uniquement les livrables générés du projet (personas, sitemap, user flows…) comme matière première
+  - `guide_ecrans` pointe vers sitemap et user flows pour dériver les vrais écrans du produit
+  - `charte_fan` : design system FAN clairement positionné comme charte à *appliquer*, pas à recréer
+  - Suppression de toute référence à la structure UI de ZENITH (sidebar projets, grille phases, livrables)
+
+---
+
 ## [2.3.1] — 2026-04-16
 
 ### Removed
