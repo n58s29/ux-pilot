@@ -4,6 +4,13 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2.3.1] — 2026-04-16
+
+### Removed
+- `zenith-mockup-spec.json` supprimé du repo — la spec est désormais générée à la volée par le bouton "⬡ Spec maquette" directement dans l'app
+
+---
+
 ## [2.3.0] — 2026-04-16
 
 ### Added

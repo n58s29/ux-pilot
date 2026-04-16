@@ -43,9 +43,8 @@ Au premier lancement, ZENITH demande une **clé API Anthropic** (`sk-ant-…`). 
 
 ```
 ux-pilot/
-├── index.html                  # Application complète (HTML + CSS + JS dans un seul fichier)
-├── zenith-mockup-spec.json     # Spécification maquette — tous les livrables UX traduits en expression de besoin pour outil de prototypage
-├── css/                        # Styles de l'ancienne version (non utilisés)
+├── index.html        # Application complète (HTML + CSS + JS dans un seul fichier)
+├── css/              # Styles de l'ancienne version (non utilisés)
 ├── js/                         # Scripts de l'ancienne version (non utilisés)
 ├── README.md
 └── CHANGELOG.md
