@@ -2122,14 +2122,20 @@ function exportMockupSpec(id) {
 
   const spec = {
     meta: {
-      nom: `ZENITH — Spec maquette — ${p.name}`,
-      description: "Expression de besoin pour produire une maquette HTML/JS/CSS vanilla semi-fonctionnelle de ZENITH, avec les données réelles du projet injectées.",
+      nom: `Spec maquette — ${p.name}`,
+      description: "Expression de besoin pour produire une maquette HTML/JS/CSS vanilla semi-fonctionnelle. Ce fichier a été généré par ZENITH (outil de gestion de projets UX de la FAN), mais la maquette à produire est celle du PROJET décrit dans ce fichier, pas celle de ZENITH.",
       version: "1.0.0",
       projet_source: { id: p.id, nom: p.name, type: p.type || null, cree_le: p.createdAt },
       genere_le: new Date().toISOString(),
       organisation: "Fabrique de l'Adoption Numérique (FAN) — SNCF",
       stack_cible: "HTML5 + CSS3 + JS vanilla — fichier unique, aucune dépendance",
-      objectif: "Prototype semi-fonctionnel avec navigation entre écrans, modals fonctionnelles et données réelles du projet"
+      objectif: "Prototype semi-fonctionnel avec navigation entre écrans, modals fonctionnelles et données réelles du projet",
+      instructions_llm: {
+        important: "Tu produis la maquette du PROJET ci-dessous, pas de l'outil ZENITH qui a généré ce fichier.",
+        naming: "Trouve un nom d'application en français, court (1 ou 2 mots max), mémorable et en lien direct avec le projet. Évite les anglicismes. Propose-le en début de réponse avant de générer le code.",
+        exemples_bons_noms: ["Baromètre → 'Repère'", "Application de gestion → 'Pilote'", "Outil de suivi → 'Vigie'", "Tableau de bord → 'Boussole'"],
+        ton: "Interface professionnelle, sobre, en français intégral (labels, placeholders, messages d'erreur, toasts)."
+      }
     },
 
     design_system: {
