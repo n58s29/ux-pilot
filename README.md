@@ -60,6 +60,7 @@ ZENITH est une **single-file app** — toute la logique est dans `index.html`.
 - Recherche par nom dans la sidebar
 - Indicateur de progression par phase (0/6)
 - Export JSON du projet complet
+- Export "Spec maquette" JSON — format orienté outil de maquettage / LLM, avec données réelles du projet
 - Import JSON (restauration ou partage)
 
 ### Phases et livrables

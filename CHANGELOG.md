@@ -4,6 +4,16 @@ Format basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2.3.0] — 2026-04-16
+
+### Added
+- **Bouton "⬡ Spec maquette"** dans le header du projet (vue d'ensemble) et dans la vue synthèse
+  - Génère et télécharge un JSON `nom-projet-mockup-spec.json` directement depuis l'app
+  - Contient le design system complet (tokens CSS, couleurs, animations), les données réelles du projet (phases, statuts, contenu de chaque livrable généré), les specs UI (4 écrans, 5 modales, composants, interactions) et les instructions d'implémentation
+  - Différent de "Exporter JSON" : format orienté outil de maquettage / LLM, pas réimportation ZENITH
+
+---
+
 ## [2.2.0] — 2026-04-16
 
 ### Added
